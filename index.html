@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pemantauan PLC - SK (F) Palong 7</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1e3a8a',
+                            lightblue: '#2563eb',
+                            navy: '#0f172a',
+                            green: '#059669',
+                            emerald: '#10b981',
+                            bg: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .print-content {
+            display: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-slate-50 text-slate-800">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50 border-b-4 border-emerald-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Header Left: School Logo & Title -->
+            <div class="flex items-center space-x-4">
+                <img src="https://iili.io/nd21GB1.md.jpg" alt="Logo SK (FELDA) Palong 7" class="h-14 w-auto object-contain bg-white p-1 rounded border border-slate-200 shadow-sm" onerror="this.onerror=null; this.src='https://via.placeholder.com/60x60?text=SKP7';">
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">SK (FELDA) PALONG 7</h1>
+                    <p class="text-xs sm:text-sm text-emerald-300 font-medium">Professional Learning Community (PLC)</p>
+                </div>
+            </div>
+
+            <!-- Header Right: User Role & Action -->
+            <div class="flex items-center space-x-3">
+                <div id="role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-600 text-white border border-emerald-400 shadow-sm">
+                    Mod: Guru
+                </div>
+                <button id="btn-toggle-role" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 px-3 py-1.5 rounded font-medium transition">
+                    Tukar Mod (JU)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS (KOTAK-KOTAK TAB BER-EMOJI) -->
+    <nav class="bg-slate-100 border-b border-slate-200 py-3 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 sm:space-x-3 overflow-x-auto">
+            <button onclick="switchTab('launch')" id="nav-launch" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-blue-900 text-white border border-blue-900 shadow-md flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">🏠</span>
+                <span>Muka Utama</span>
+            </button>
+            <button onclick="switchTab('tools')" id="nav-tools" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">🤝</span>
+                <span>Alat Kolaboratif</span>
+            </button>
+            <button onclick="switchTab('rujukan')" id="nav-rujukan" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">📚</span>
+                <span>Bahan Rujukan</span>
+            </button>
+            <button onclick="switchTab('opr')" id="nav-opr" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">📝</span>
+                <span>Borang Tugasan OPR</span>
+            </button>
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">📊</span>
+                <span>Dashboard Rekod</span>
+            </button>
+            <button onclick="switchTab('game')" id="nav-game" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">🎮</span>
+                <span>PLC Battle Game</span>
+            </button>
+            <button onclick="switchTab('galeri')" id="nav-galeri" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 shadow-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
+                <span class="text-base">🖼️</span>
+                <span>Galeri Gambar</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= 1. LAUNCH SCREEN ================= -->
+        <section id="tab-launch" class="tab-content space-y-8">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-blue-950 via-blue-900 to-emerald-900 rounded-xl shadow-xl p-8 sm:p-12 text-white relative overflow-hidden border border-blue-800">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-emerald-500 text-slate-950 font-bold text-xs uppercase tracking-wider rounded mb-4">
+                        SKP7 ON TRACK!
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-2">
+                        PLC: MISSION ON!
+                    </h2>
+                    <p class="text-emerald-400 font-semibold text-lg sm:text-xl mb-4">
+                        6 Alat • 3 Misi • 1 Impak
+                    </p>
+                    <p class="text-slate-300 text-base sm:text-lg mb-2 italic">
+                        Professional Learning Community 2026
+                    </p>
+                    <p class="text-xl sm:text-2xl font-light text-slate-100 border-l-4 border-emerald-400 pl-4 py-1 my-6">
+                        “Daripada Isu Bilik Darjah kepada Impak Pembelajaran.”
+                    </p>
+                    
+                    <div class="pt-4">
+                        <button onclick="switchTab('opr')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 border border-emerald-400">
+                            MULAKAN MISI
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jurulatih Utama Section -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm text-center">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-6">JURULATIH UTAMA (JU) PLC SKP7</h4>
+                <div class="flex flex-wrap justify-center items-center gap-8 sm:gap-16">
+                    <div class="flex flex-col items-center max-w-xs">
+                        <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-blue-900 shadow-md mb-3 overflow-hidden bg-slate-100 flex items-center justify-center p-0.5">
+                            <img src="https://iili.io/ndGy4Gj.md.png" alt="MOHAMAD NAIM BIN SAHARI" class="w-full h-full object-cover object-top rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/120?text=NAIM';">
+                        </div>
+                        <h5 class="text-sm sm:text-base font-bold text-slate-800">MOHAMAD NAIM BIN SAHARI</h5>
+                        <span class="text-xs text-blue-900 font-semibold mt-0.5">Jurulatih Utama PLC</span>
+                    </div>
+                    <div class="flex flex-col items-center max-w-xs">
+                        <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-emerald-500 shadow-md mb-3 overflow-hidden bg-slate-100 flex items-center justify-center p-0.5">
+                            <img src="https://iili.io/ndGi0xV.md.png" alt="SITI AISHAH BINTI HASSAN" class="w-full h-full object-cover object-top rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/120?text=AISHAH';">
+                        </div>
+                        <h5 class="text-sm sm:text-base font-bold text-slate-800">SITI AISHAH BINTI HASSAN</h5>
+                        <span class="text-xs text-emerald-600 font-semibold mt-0.5">Jurulatih Utama PLC</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 2. ALAT KOLABORATIF ================= -->
+        <section id="tab-tools" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-2xl font-bold text-blue-900">Alat Kolaboratif PLC</h2>
+                <p class="text-sm text-slate-600">Sila pilih alat kolaboratif di bawah untuk melihat maklumat terperinci, infografik, dan panduan pelaksanaan lengkap.</p>
+            </div>
+
+            <!-- Sub Navigation Tabs for Tools -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <button onclick="showToolDetail(1)" id="tool-btn-1" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>🎬</span> <span>1. Kritikan Video</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Video Critique</div>
+                </button>
+                <button onclick="showToolDetail(2)" id="tool-btn-2" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>🚶‍♂️</span> <span>2. Jelajah Pembelajaran</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Learning Walk</div>
+                </button>
+                <button onclick="showToolDetail(3)" id="tool-btn-3" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>🤝</span> <span>3. Bimbingan Rakan</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Peer Coaching</div>
+                </button>
+                <button onclick="showToolDetail(4)" id="tool-btn-4" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>📖</span> <span>4. Lesson Study</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Rancangan Harian</div>
+                </button>
+                <button onclick="showToolDetail(5)" id="tool-btn-5" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>💬</span> <span>5. Perkongsian Guru</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Sharing Session</div>
+                </button>
+                <button onclick="showToolDetail(6)" id="tool-btn-6" class="tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm">
+                    <div class="text-sm font-bold text-blue-900 flex items-center space-x-1.5">
+                        <span>🧩</span> <span>6. Penyelesai Masalah</span>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium ml-6">Problem Solving</div>
+                </button>
+            </div>
+
+            <!-- Detail Display Card Container -->
+            <div id="tool-detail-card" class="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-md transition-all duration-300">
+                <!-- Dynamic Content injected via JS -->
+            </div>
+        </section>
+
+        <!-- ================= 3. BAHAN RUJUKAN ================= -->
+        <section id="tab-rujukan" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-2xl font-bold text-blue-900">Bahan Rujukan PLC</h2>
+                <p class="text-sm text-slate-600">Muat turun dan semak panduan rasmi Kit PLC KPM serta slaid pembentangan Jurulatih Utama.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Kit PLC KPM Card -->
+                <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-lg flex items-center justify-center font-bold text-xl mb-4">
+                            KIT
+                        </div>
+                        <h3 class="text-lg font-bold text-blue-900 mb-2">Kit PLC KPM (BPLTV / BPKS)</h3>
+                        <p class="text-sm text-slate-600 mb-4">
+                            Dokumen panduan rasmi Kementerian Pendidikan Malaysia mengenai garis panduan pelaksanaan Professional Learning Community di sekolah.
+                        </p>
+                        <ul class="text-xs text-slate-500 space-y-1 mb-6">
+                            <li>• Modul 6 Alat Kolaboratif</li>
+                            <li>• Borang-borang Standard PLC</li>
+                            <li>• Panduan Penilaian Impak</li>
+                        </ul>
+                    </div>
+                    <a href="https://online.anyflip.com/zexy/xluw/mobile/index.html" target="_blank" rel="noopener noreferrer" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded text-sm transition text-center block">
+                        Buka Kit PLC KPM
+                    </a>
+                </div>
+
+                <!-- Slide Pembentangan JU Card -->
+                <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-900 rounded-lg flex items-center justify-center font-bold text-sm mb-4">
+                            SLIDE
+                        </div>
+                        <h3 class="text-lg font-bold text-blue-900 mb-2">Slide Pembentangan JU PLC</h3>
+                        <p class="text-sm text-slate-600 mb-4">
+                            Slaid Taklimat dan Bengkel Pelaksanaan PLC 2026 yang disediakan oleh Ustazah Siti Aishah & Cikgu Mohd Naim.
+                        </p>
+                        <ul class="text-xs text-slate-500 space-y-1 mb-6">
+                            <li>• Pengenalan PLC SKP7 On Track</li>
+                            <li>• Kaedah Penulisan OPR Ringkas & Padat</li>
+                            <li>• Strategi Pembudayaan PLC Sekolah</li>
+                        </ul>
+                    </div>
+                    <a href="https://canva.link/f355wbsm6oua0ka" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded text-sm transition text-center block">
+                        Buka Slide Pembentangan JU
+                    </a>
+                </div>
+            </div>
+
+            <!-- Butang Kembali ke Muka Utama -->
+            <div class="pt-4 border-t border-slate-200 flex justify-end">
+                <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Kembali ke Muka Utama</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 4. BORANG TUGASAN OPR ================= -->
+        <section id="tab-opr" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-2xl font-bold text-blue-900">Borang Laporan OPR (One Page Report)</h2>
+                <p class="text-sm text-slate-600">Sila isi maklumat pencerapan / program PLC di bawah dengan lengkap dan tekan butang simpan di bahagian bawah borang.</p>
+            </div>
+
+            <form id="opr-form" onsubmit="handleFormSubmit(event)" class="bg-white p-6 sm:p-8 rounded-lg border border-slate-200 shadow-md space-y-6">
+                
+                <!-- Section 1: Maklumat Asas -->
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 border-b pb-2 mb-4">1. MAKLUMAT UTAMA PENCERAPAN</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        
+                        <!-- Alat Kolaborasi -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Alat Kolaborasi</label>
+                            <select id="input-alat" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                                <option value="">-- Pilih Alat Kolaborasi --</option>
+                                <option value="Kritikan Video (Video Critique)">Kritikan Video (Video Critique)</option>
+                                <option value="Jelajah Pembelajaran (Learning Walk)">Jelajah Pembelajaran (Learning Walk)</option>
+                                <option value="Bimbingan Rakan Sekerja (Peer Coaching)">Bimbingan Rakan Sekerja (Peer Coaching)</option>
+                                <option value="Belajar Menggunakan Rancangan Harian (Lesson Study)">Belajar Menggunakan Rancangan Harian (Lesson Study)</option>
+                                <option value="Sesi Perkongsian Guru (Teacher Sharing Session)">Sesi Perkongsian Guru (Teacher Sharing Session)</option>
+                                <option value="Kumpulan Penyelesai Masalah (Problem Solving Group)">Kumpulan Penyelesai Masalah (Problem Solving Group)</option>
+                            </select>
+                        </div>
+
+                        <!-- Panitia -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Panitia</label>
+                            <select id="input-panitia" onchange="updateTeacherDropdown()" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                                <option value="">-- Pilih Panitia --</option>
+                                <option value="Bahasa Melayu">Bahasa Melayu</option>
+                                <option value="Bahasa Inggeris">Bahasa Inggeris</option>
+                                <option value="Matematik & Sains">Matematik & Sains</option>
+                                <option value="Pendidikan Islam & Bahasa Arab">Pendidikan Islam & Bahasa Arab</option>
+                                <option value="Pendidikan Jasmani Dan Kesihatan">Pendidikan Jasmani Dan Kesihatan</option>
+                                <option value="Prasekolah & Pemulihan Khas">Prasekolah & Pemulihan Khas</option>
+                            </select>
+                        </div>
+
+                        <!-- Nama Guru Yang Dicerap -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Guru Yang Dicerap</label>
+                            <select id="input-guru" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                                <option value="">-- Pilih Panitia Terlebih Dahulu --</option>
+                            </select>
+                        </div>
+
+                        <!-- Kelas -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kelas</label>
+                            <select id="input-kelas" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                                <option value="">-- Pilih Kelas --</option>
+                                <option value="1 Zaaba">1 Zaaba</option>
+                                <option value="2 Zaaba">2 Zaaba</option>
+                                <option value="2 Aminuddin Baki">2 Aminuddin Baki</option>
+                                <option value="3 Zaaba">3 Zaaba</option>
+                                <option value="3 Aminuddin Baki">3 Aminuddin Baki</option>
+                                <option value="4 Zaaba">4 Zaaba</option>
+                                <option value="4 Aminuddin Baki">4 Aminuddin Baki</option>
+                                <option value="5 Zaaba">5 Zaaba</option>
+                                <option value="5 Aminuddin Baki">5 Aminuddin Baki</option>
+                                <option value="6 Zaaba">6 Zaaba</option>
+                                <option value="6 Aminuddin Baki">6 Aminuddin Baki</option>
+                            </select>
+                        </div>
+
+                        <!-- Tarikh -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tarikh</label>
+                            <input type="date" id="input-tarikh" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                        </div>
+
+                        <!-- Masa -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Masa</label>
+                            <input type="text" id="input-masa" placeholder="Contoh: 09:00 AM - 10:00 AM" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                        </div>
+
+                        <!-- Pengumpulan Data -->
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pengumpulan Data</label>
+                            <select id="input-pengumpulan-data" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                                <option value="">-- Pilih Jenis Pengumpulan Data --</option>
+                                <option value="PBD">PBD (Pentaksiran Bilik Darjah)</option>
+                                <option value="Markah Prestasi">Markah Prestasi / Ujian</option>
+                                <option value="Refleksi RPH">Refleksi RPH</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Proses Pelaksanaan -->
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 border-b pb-2 mb-4">2. PROSES PELAKSANAAN ALAT KOLABORASI</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fokus (Focus)</label>
+                            <textarea id="input-fokus" rows="2" placeholder="Nyatakan fokus utama pencerapan atau perbincangan..." required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Penambahbaikan (Improve)</label>
+                            <textarea id="input-improve" rows="2" placeholder="Nyatakan CADANGAN penambahbaikan yang disepakati..." required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Perkongsian (Share)</label>
+                            <textarea id="input-share" rows="2" placeholder="Nyatakan kaedah perkongsian amalan terbaik..." required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Gambar Pelaksanaan -->
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 border-b pb-2 mb-4">3. GAMBAR PELAKSANAAN (3 GAMBAR)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 1</label>
+                            <input type="file" id="img-input-1" accept="image/*" onchange="previewImage(this, 'preview-1')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
+                                <img id="preview-1" class="hidden w-full h-full object-cover">
+                                <span id="preview-1-label" class="text-xs text-slate-400">Tiada Gambar</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 2</label>
+                            <input type="file" id="img-input-2" accept="image/*" onchange="previewImage(this, 'preview-2')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
+                                <img id="preview-2" class="hidden w-full h-full object-cover">
+                                <span id="preview-2-label" class="text-xs text-slate-400">Tiada Gambar</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 3</label>
+                            <input type="file" id="img-input-3" accept="image/*" onchange="previewImage(this, 'preview-3')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
+                                <img id="preview-3" class="hidden w-full h-full object-cover">
+                                <span id="preview-3-label" class="text-xs text-slate-400">Tiada Gambar</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Disediakan Oleh -->
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 border-b pb-2 mb-4">4. DISEDIAKAN OLEH</h3>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Guru (Disediakan Oleh)</label>
+                        <select id="input-disediakan" required class="w-full border border-slate-300 rounded p-2.5 text-sm focus:ring-2 focus:ring-blue-900 focus:outline-none">
+                            <option value="">-- Pilih Nama Guru --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 5: Status Hantar & Simpan Rekod -->
+                <div class="bg-slate-50 p-5 rounded-lg border-2 border-blue-900/20 space-y-4">
+                    <h3 class="text-base font-bold text-blue-900 border-b border-slate-200 pb-2">5. STATUS PENGHANTARAN & SIMPAN REKOD</h3>
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        
+                        <!-- Pilihan Status Hantar / Tidak Hantar -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wide">PILIH STATUS PENGHANTARAN:</label>
+                            <div class="flex items-center space-x-6 bg-white p-3 rounded-md border border-slate-300 shadow-sm">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="status-hantar" value="Hantar" checked class="w-4 h-4 text-emerald-600 focus:ring-emerald-500">
+                                    <span class="ml-2 text-sm font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-300">
+                                        ✓ HANTAR
+                                    </span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="status-hantar" value="Tidak Hantar" class="w-4 h-4 text-red-600 focus:ring-red-500">
+                                    <span class="ml-2 text-sm font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded border border-red-300">
+                                        ✕ TIDAK HANTAR
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Butang Simpan Rekod OPR -->
+                        <div class="flex flex-col items-stretch md:items-end space-y-2">
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base py-3.5 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 border border-emerald-400 flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                </svg>
+                                <span>SIMPAN REKOD OPR</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Nota Peringatan Penting -->
+                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-xs text-amber-900 flex items-start space-x-2">
+                        <span class="font-bold text-amber-700">⚠️ PERINGATAN IMPORTANT:</span>
+                        <span>
+                            Sila pastikan anda menekan butang <strong>"SIMPAN REKOD OPR"</strong> di atas. Jika tidak menekan butang simpan ini, segala maklumat dan data yang telah diisi <strong>TIDAK AKAN DIHANTAR ATAU DISIMPAN</strong> ke dalam Rekod Simpanan Dashboard.
+                        </span>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <!-- Butang Kembali ke Muka Utama -->
+            <div class="pt-4 border-t border-slate-200 flex justify-end">
+                <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Kembali ke Muka Utama</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 5. DASHBOARD REKOD ================= -->
+        <section id="tab-dashboard" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-900">Dashboard Rekod OPR</h2>
+                    <p class="text-sm text-slate-600">Senarai penuh rekod pencerapan PLC yang telah dihantar / disimpan.</p>
+                </div>
+                <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded text-sm shadow transition">
+                    Cetak Dashboard
+                </button>
+            </div>
+
+            <!-- Record Table -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
+                            <th class="p-3">Bil</th>
+                            <th class="p-3">Tarikh / Masa</th>
+                            <th class="p-3">Alat Kolaborasi</th>
+                            <th class="p-3">Panitia</th>
+                            <th class="p-3">Guru Dicerap</th>
+                            <th class="p-3">Kelas</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table-body" class="divide-y divide-slate-200">
+                        <!-- Dynamic Records populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Butang Kembali ke Muka Utama -->
+            <div class="pt-4 border-t border-slate-200 flex justify-end">
+                <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Kembali ke Muka Utama</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 6. PLC BATTLE GAME ================= -->
+        <section id="tab-game" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🎮</span>
+                        <h2 class="text-2xl font-bold text-blue-900">PLC Battle Game</h2>
+                    </div>
+                    <p class="text-sm text-slate-600">Permainan interaktif cabaran & misi PLC SK (FELDA) Palong 7.</p>
+                </div>
+                <a href="https://plc-battle-mission-impact.g-60125548.chatgpt.site" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm shadow transition flex items-center space-x-2 border border-emerald-400">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V3h-6z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 100-2H5z"/></svg>
+                    <span>Buka Tetingkap Penuh (New Tab)</span>
+                </a>
+            </div>
+
+            <!-- Embedded Game Frame -->
+            <div class="bg-slate-900 p-2 sm:p-4 rounded-2xl shadow-xl border-2 border-blue-900">
+                <div class="relative w-full rounded-xl overflow-hidden bg-slate-950" style="height: 75vh; min-height: 550px;">
+                    <iframe 
+                        src="https://plc-battle-mission-impact.g-60125548.chatgpt.site" 
+                        class="w-full h-full border-0 rounded-xl"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen
+                        title="PLC Battle Game">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Butang Kembali ke Muka Utama -->
+            <div class="pt-4 border-t border-slate-200 flex justify-end">
+                <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Kembali ke Muka Utama</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 7. GALERI GAMBAR ================= -->
+        <section id="tab-galeri" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🖼️</span>
+                        <h2 class="text-2xl font-bold text-blue-900">Galeri Gambar Aktiviti PLC</h2>
+                    </div>
+                    <p class="text-sm text-slate-600">Himpunan foto-foto pelaksanaan program PLC, pencerapan, dan sesi kolaboratif guru SKP7.</p>
+                </div>
+                <button onclick="switchTab('opr')" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                    <span>➕ Muat Naik Gambar (Guna Borang OPR)</span>
+                </button>
+            </div>
+
+            <!-- Gallery Filter Buttons -->
+            <div class="flex flex-wrap gap-2 pb-2">
+                <button onclick="filterGallery('semua')" id="filter-btn-semua" class="gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-900 text-white shadow-sm border border-blue-900">Semua Gambar</button>
+                <button onclick="filterGallery('Learning Walk')" id="filter-btn-lw" class="gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100">Jelajah Pembelajaran</button>
+                <button onclick="filterGallery('Peer Coaching')" id="filter-btn-pc" class="gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100">Bimbingan Rakan Sekerja</button>
+                <button onclick="filterGallery('Lesson Study')" id="filter-btn-ls" class="gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100">Lesson Study</button>
+                <button onclick="filterGallery('Teacher Sharing Session')" id="filter-btn-tss" class="gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100">Perkongsian Guru</button>
+            </div>
+
+            <!-- Dynamic Gallery Grid Container -->
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Butang Kembali ke Muka Utama -->
+            <div class="pt-4 border-t border-slate-200 flex justify-end">
+                <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Kembali ke Muka Utama</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JU AUTH MODAL -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            <h3 class="text-lg font-bold text-blue-900 mb-2">Pengesahan Mod JU</h3>
+            <p class="text-xs text-slate-600 mb-4">Sila masukkan kata laluan Jurulatih Utama (JU) untuk mengakses kebenaran khas.</p>
+            <input type="password" id="ju-password-input" placeholder="Masukkan Kata Laluan" class="w-full border border-slate-300 rounded p-2 text-sm mb-4 focus:ring-2 focus:ring-blue-900 focus:outline-none">
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeAuthModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-semibold">Batal</button>
+                <button onclick="verifyJU()" class="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded text-xs font-semibold">Sahkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4" onclick="closeLightbox()">
+        <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-700" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute top-3 right-3 bg-slate-900/70 text-white hover:bg-slate-900 w-9 h-9 rounded-full flex items-center justify-center font-bold z-10 transition">✕</button>
+            <div class="p-2 bg-slate-900 flex items-center justify-center max-h-[75vh]">
+                <img id="lightbox-img" class="max-h-[70vh] w-auto object-contain rounded-lg shadow" src="" alt="Full view">
+            </div>
+            <div class="p-4 bg-white">
+                <h4 id="lightbox-title" class="font-bold text-slate-900 text-base"></h4>
+                <p id="lightbox-desc" class="text-xs text-slate-600 mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let isJU = false;
+        let activeGalleryFilter = 'semua';
+
+        // Updated Teacher List by Panitia Data Model (Full Names SKP7)
+        const teacherData = {
+            "Bahasa Melayu": [
+                "ABDUL LATIF BIN SANUSI",
+                "IZZAT AIMAN BIN ABDULLAH",
+                "MUHAMMAD FIRAS SHAFIQ BIN MOHD ROSLI",
+                "MUHAMMAD ALIF BIN ZAINAL ASHAR",
+                "KAMARUDIN BIN MOHAMED YASSIN"
+            ],
+            "Bahasa Inggeris": [
+                "FAUZIAH BINTI MOHD IZHAM",
+                "NORZAMZURIANI BINTI ISMAIL",
+                "NOR HAYRIESYA BINTI YUSRI",
+                "NOOR AFIQAH BINTI IDRIS",
+                "NURSYAHIRAH MAISARAH BINTI SHAHARUDDIN",
+                "NOR FATIN SHUHADA BINTI MOHD FAZIL"
+            ],
+            "Matematik & Sains": [
+                "ZAINI BIN NGAI SENIN",
+                "SURESH A/L SUBRAMANIAM",
+                "THARSSHINI A/P GENGATHARAN",
+                "SITI FADZILAH BINTI FAIDI",
+                "MAY IZZATIE BINTI MOHD RIDZUAN"
+            ],
+            "Pendidikan Islam & Bahasa Arab": [
+                "MOHD IHSAN BIN MOHD APDI @ NORMI",
+                "SITI HUSNA BINTI MOHD SUBRI",
+                "MUHAMAD ASRAF BIN MASLI",
+                "SYAHIRAH BINTI SAODI",
+                "MOHAMAD ASYRAF BIN AZMI (GURU PRAKTIKAL)"
+            ],
+            "Pendidikan Jasmani Dan Kesihatan": [
+                "MUHAMMAD IKHMAL BIN ADZHARIE @ATHAUR",
+                "MOHD AMIRUL HAKIM BIN MOHD AMRI",
+                "YUSUP BIN AZIZ",
+                "MUHAMMAD DANIAL BIN ROSLI"
+            ],
+            "Prasekolah & Pemulihan Khas": [
+                "SITI HAISAH BINTI SAHROM",
+                "AL AINAA MARDHIA BINTI ABD KADIR",
+                "MOHD RAZFAISHAL BIN MUHAMAD",
+                "SYAHIR AFHAM BIN JAWAWI"
+            ]
+        };
+
+        // Complete 6 Collaborative Tools Information
+        const toolDetails = {
+            1: {
+                bm: "1. KRITIKAN VIDEO",
+                en: "VIDEO CRITIQUE",
+                img: "https://iili.io/ndQQdTQ.md.png",
+                whatIs: "Kritikan Video ialah aktiviti guru menonton dan menganalisis rakaman PdP secara terancang dan profesional. Rakaman digunakan sebagai bukti sebenar untuk melihat kekuatan, mengenal pasti perkara yang boleh ditambah baik dan merancang tindakan seterusnya.\n\nTujuannya bukan untuk mencari kesalahan guru, tetapi membantu guru melihat PdP secara lebih objektif berdasarkan apa yang benar-benar berlaku di dalam kelas.",
+                objectives: [
+                    "Menjana pemikiran kritis dan kreatif berdasarkan rakaman PdP.",
+                    "Membudayakan amalan mengkritik secara profesional, berhemah dan berasaskan bukti.",
+                    "Meningkatkan kualiti guru dari aspek pengetahuan, kemahiran, sikap dan sahsiah."
+                ],
+                focusTitle: "🔵 FOCUS",
+                focusSteps: [
+                    "① Bentuk pasukan Kritikan Video.",
+                    "② Tetapkan objektif dan fokus pemerhatian.",
+                    "③ Pilih PdP yang hendak dirakam.",
+                    "④ Rakam PdP ahli kumpulan.",
+                    "⑤ Tonton rakaman bersama-sama.",
+                    "⑥ Kenal pasti bukti berdasarkan fokus yang dipersetujui."
+                ],
+                focusText: "💡 Contoh fokus: “Adakah semua murid terlibat secara aktif semasa aktiviti kumpulan?”",
+                improveTitle: "🟢 IMPROVE",
+                improveText: "Guru menganalisis rakaman dan membincangkan:\n• Apa yang berjaya?\n• Apa bukti yang dapat dilihat?\n• Apa yang masih kurang?\n• Mengapa perkara tersebut berlaku?\n• Apakah strategi yang boleh ditambah baik?\n\n⚠️ Maklum balas mestilah berdasarkan bukti dalam rakaman, bukan andaian atau penilaian peribadi.",
+                shareTitle: "🟠 SHARE",
+                shareText: "Amalan terbaik dan hasil penambahbaikan dikongsi kepada guru lain melalui mesyuarat, bengkel, PLC atau platform digital.",
+                exampleTitle: "💡 Contoh mudah",
+                exampleText: "Guru merakam aktiviti Think-Pair-Share. Selepas menonton video, kumpulan mendapati hanya murid tertentu aktif menjawab. Guru kemudian menambah penggunaan random name picker dan response cards. Strategi yang berjaya dikongsi kepada guru lain.",
+                keyNote: "📌 Ingat:\n“Kritik amalan, bukan individu.”"
+            },
+            2: {
+                bm: "2. JELAJAH PEMBELAJARAN",
+                en: "LEARNING WALK",
+                img: "https://iili.io/ndQsQ0g.md.png",
+                whatIs: "Learning Walk ialah lawatan ringkas dan berfokus ke bilik darjah untuk melihat bukti pembelajaran murid berdasarkan fokus yang telah dipersetujui.\n\nPemerhati tidak datang untuk “menilai guru”, tetapi untuk mempelajari amalan PdP yang berlaku di dalam kelas.",
+                objectives: [
+                    "Mengumpul bukti aktiviti pembelajaran murid atau learning in action.",
+                    "Membincangkan dapatan berdasarkan bukti pemerhatian.",
+                    "Mempelajari dan menyebarkan amalan terbaik yang boleh dicontohi."
+                ],
+                focusTitle: "🔵 FOCUS",
+                focusSteps: [
+                    "① Sebelum lawatan: Bentuk kumpulan, lantik Lead Walker, tetapkan objektif, tentukan kelas dan masa lawatan.",
+                    "② Tetapkan fokus pemerhatian yang spesifik. (Contoh: “Bagaimanakah guru memastikan semua murid memberikan respons semasa PdP?”)",
+                    "③ Semasa lawatan, pemerhati tidak mengganggu proses PdP dan hanya mencatat bukti berdasarkan fokus."
+                ],
+                improveTitle: "🟢 IMPROVE",
+                improveText: "Selepas lawatan:\n• Kumpulkan dapatan & analisis bukti pemerhatian.\n• Kenal pasti pola atau amalan yang berkesan.\n• Laksanakan sesi refleksi & tentukan perkara yang boleh dicuba dalam kelas sendiri.\n\n❌ Elakkan komen: “Guru itu kurang menarik.”\n✅ Gunakan bukti: “Semasa aktiviti soal jawab, 8 daripada 10 murid yang diperhatikan memberikan respons menggunakan mini whiteboard.”",
+                shareTitle: "🟠 SHARE",
+                shareText: "Amalan terbaik yang dikenal pasti dikongsi dengan guru lain, sebaik-baiknya dalam tempoh seminggu supaya dapatan masih relevan dan boleh terus dicuba.",
+                keyNote: "📌 Prinsip utama:\nObserve → Learn → Improve → Share\nLearning Walk ialah belajar daripada bilik darjah, bukan menghakimi bilik darjah."
+            },
+            3: {
+                bm: "3. BIMBINGAN RAKAN SEKERJA",
+                en: "PEER COACHING",
+                img: "https://iili.io/ndQiZAl.md.png",
+                whatIs: "Peer Coaching ialah kerjasama antara dua atau lebih guru untuk merancang, melaksanakan, memerhati dan menilai PdP bersama.\n\nHubungan ini berasaskan kepercayaan, sokongan dan maklum balas profesional, bukan konsep “guru hebat menilai guru lemah”.",
+                objectives: [
+                    "Membudayakan proses prakonferensi, pemerhatian dan pascakonferensi.",
+                    "Membantu guru memahami peranan coach dengan betul.",
+                    "Mempelajari amalan terbaik daripada rakan sekerja.",
+                    "Meningkatkan kemahiran dan keyakinan guru dalam PdP."
+                ],
+                phases: [
+                    { title: "① PRAKONFERENSI (Sebelum PdP)", desc: "Tetapkan objektif, tentukan fokus pemerhatian & bincangkan strategi. Jelaskan perkara yang guru mahu coach perhatikan.\nContoh: “Saya mahu awak perhatikan sama ada arahan aktiviti saya mudah difahami oleh murid.”" },
+                    { title: "② PEMERHATIAN (Semasa PdP)", desc: "Guru menjalankan pengajaran & Coach memerhati berdasarkan fokus. Catat bukti, bukan membuat andaian. Elakkan mengganggu PdP." },
+                    { title: "③ PASCAPERSIDANGAN (Selepas PdP)", desc: "Analisis bukti. Guru membuat refleksi & Coach memberikan maklum balas. Bincangkan kekuatan dan ruang penambahbaikan serta rancang tindakan seterusnya." }
+                ],
+                models: [
+                    "Model A: Guru mengajar → Coach memerhati",
+                    "Model B: Coach mengajar → Guru memerhati",
+                    "Model C: Guru dan Coach mengajar bersama (co-teaching)"
+                ],
+                keyNote: "📌 Ingat:\nPeer Coaching bukan “Saya datang menilai awak.”\nTetapi “Kita sama-sama baiki PdP.”"
+            },
+            4: {
+                bm: "4. LESSON STUDY",
+                en: "LESSON STUDY",
+                img: "https://iili.io/ndQPPpV.md.png",
+                whatIs: "Lesson Study ialah proses guru merancang satu pengajaran secara kolaboratif, melaksanakan pengajaran tersebut, memerhatikan pembelajaran murid, membuat refleksi dan memurnikan semula rancangan PdP.\n\nFokus utama bukan kepada “siapa yang mengajar”, tetapi: “Adakah rancangan pengajaran ini benar-benar membantu murid belajar?”",
+                objectives: [
+                    "Meningkatkan kualiti pengajaran dan pembelajaran murid dalam jangka panjang.",
+                    "Meningkatkan amalan refleksi guru.",
+                    "Membina pengetahuan dan pemahaman guru tentang masalah pembelajaran murid."
+                ],
+                stepsList: [
+                    { t: "① TETAPKAN MATLAMAT", d: "Pilih tajuk, objektif pembelajaran, isu murid, dan fokus pemerhatian." },
+                    { t: "② BINA RPH BERSAMA", d: "Guru merancang strategi PdP, aktiviti, BBM, soalan, pentaksiran, dan jangkaan respons murid secara kolaboratif." },
+                    { t: "③ LAKSANA & PERHATI", d: "Seorang guru melaksanakan PdP. Ahli lain memerhati pembelajaran murid, mengumpul bukti dan mencatat respons murid berdasarkan fokus." },
+                    { t: "④ REFLEKSI", d: "Selepas PdP: Nilai pencapaian objektif, analisis bukti, kenal pasti kekuatan & kelemahan RPH, serta bincangkan sebab sesuatu strategi berjaya atau tidak." },
+                    { t: "⑤ MURNIKAN & KONGSI", d: "RPH ditambah baik berdasarkan dapatan. Jika perlu, RPH yang telah dimurnikan boleh dilaksanakan semula sebelum dikongsi sebagai amalan terbaik." }
+                ],
+                exampleTitle: "💡 Contoh",
+                exampleText: "Isu: Murid Tahun 2 sukar membezakan هٰذَا dan هٰذِهِ.\nKumpulan guru membina satu RPH bersama menggunakan kad visual dan permainan pengelasan. Selepas PdP, respons murid dianalisis dan aktiviti yang kurang berkesan diperbaiki.",
+                keyNote: "📌 Formula mudah:\nPLAN → TEACH → OBSERVE → REFLECT → REFINE"
+            },
+            5: {
+                bm: "5. SESI PERKONGSIAN GURU",
+                en: "TEACHER SHARING SESSION",
+                img: "https://iili.io/ndQPTqg.md.png",
+                whatIs: "Sesi Perkongsian Guru ialah pertemuan secara formal atau terancang untuk guru berkongsi ilmu, kemahiran, pengalaman dan amalan pedagogi yang berkesan.\n\nIa tidak semestinya berbentuk ceramah panjang. Sesi boleh dibuat secara ringkas tetapi mempunyai fokus dan hasil yang jelas.",
+                objectives: [
+                    "Berkongsi pengetahuan, kemahiran dan amalan terbaik dalam kalangan guru.",
+                    "Membantu pembangunan profesionalisme guru.",
+                    "Memberikan ruang guru belajar daripada pengalaman sebenar rakan sekerja.",
+                    "Menghasilkan idea atau strategi yang boleh terus digunakan dalam PdP."
+                ],
+                focusTitle: "🔵 FOCUS",
+                focusText: "• Kenal pasti isu atau keperluan.\n• Tetapkan objektif perkongsian & tentukan tajuk.\n• Pilih guru/pembentang atau bahan yang sesuai.\n• Sediakan contoh, eviden atau bahan sokongan.",
+                improveTitle: "🟢 IMPROVE",
+                improveText: "Semasa/selepas perkongsian:\n• Catat isi penting & jalankan sesi soal jawab.\n• Bincangkan bagaimana idea boleh diaplikasikan.\n• Guru mencuba strategi tersebut dalam PdP.\n• Buat penambahbaikan berdasarkan konteks kelas masing-masing.",
+                shareTitle: "🟠 SHARE",
+                shareText: "Hasil boleh disebarkan melalui mesyuarat, bengkel, Telegram/WhatsApp, Google Drive, portal sekolah, infografik, atau bank BBM.",
+                exampleTitle: "💡 Contoh",
+                exampleText: "Seorang guru berkongsi: “5 Cara Menggunakan Exit Ticket untuk Pentaksiran Formatif.”\nGuru lain mencuba teknik tersebut di kelas dan kemudian berkongsi hasil serta penambahbaikan.",
+                keyNote: "📌 Prinsipnya:\nSeorang guru berkongsi → ramai guru mencuba → lebih ramai murid mendapat manfaat."
+            },
+            6: {
+                bm: "6. KUMPULAN PENYELESAI MASALAH",
+                en: "PROBLEM SOLVING GROUP",
+                img: "https://iili.io/ndQrb4f.md.png",
+                whatIs: "Sekumpulan guru bekerjasama untuk mengenal pasti sesuatu masalah, menganalisis puncanya, menjana beberapa penyelesaian, memilih tindakan terbaik dan menilai keberkesanannya.\n\nSangat sesuai apabila sekolah mempunyai isu PdP atau pembelajaran murid yang jelas dan memerlukan tindakan bersama.",
+                objectives: [
+                    "Membudayakan penyelesaian masalah secara kolaboratif.",
+                    "Membuat keputusan berdasarkan maklumat atau data.",
+                    "Meningkatkan pencapaian murid melalui penyelesaian isu bilik darjah.",
+                    "Membantu guru mencapai hasil yang ditetapkan."
+                ],
+                focusTitle: "🔵 FOCUS",
+                focusSteps: [
+                    "① ANALISIS MASALAH: Kenal pasti masalah berdasarkan PBD, latihan, pemerhatian, ujian, kehadiran, soal selidik, atau Student Voice. Pastikan spesifik (❌ 'Murid lemah Bahasa Arab' -> ✅ '15 daripada 25 murid Tahun 4 masih gagal mengingat sekurang-kurangnya 8 daripada 12 kosa kata Unit 3').",
+                    "② JANA PILIHAN: Senaraikan sebanyak mungkin cadangan penyelesaian (gamifikasi, flashcard, peer learning, retrieval practice, digital quiz, intervensi kumpulan kecil).",
+                    "③ NILAI KESAN: Pertimbangkan manfaat, masa, sumber, risiko, kebolehlaksanaan & kesesuaian dengan murid.",
+                    "④ LAKSANA: Pilih cadangan terbaik dan jalankan intervensi."
+                ],
+                improveTitle: "🟢 IMPROVE",
+                improveText: "⑤ REFLEKSI: Bandingkan data sebelum dan selepas tindakan. Tanya:\n• Adakah masalah berkurang?\n• Adakah objektif tercapai?\n• Strategi mana paling berkesan?\n• Apa yang perlu diubah?\nJika belum berjaya, kumpulan membuat penambahbaikan dan mencuba tindakan seterusnya.",
+                shareTitle: "🟠 SHARE",
+                shareText: "⑥ SEBAR AMALAN: Jika strategi menunjukkan kesan positif, kongsi masalah asal, tindakan, bukti/data, hasil & strategi yang berjaya kepada guru lain.",
+                keyNote: "📌 Formula mudah:\nMASALAH → PUNCA → PILIHAN → TINDAKAN → IMPAK → KONGSI"
+            }
+        };
+
+        // Rekod dimuatkan daripada LocalStorage atau dimulakan sebagai senarai kosong
+        let records = [];
+        try {
+            const savedRecords = localStorage.getItem('skp7_plc_records');
+            if (savedRecords) {
+                records = JSON.parse(savedRecords);
+            }
+        } catch (e) {
+            console.error('Gagal memuatkan rekod daripada LocalStorage:', e);
+            records = [];
+        }
+
+        const sampleGalleryImages = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-blue-900', 'text-white', 'border-blue-900', 'shadow-md');
+                el.classList.add('bg-white', 'text-slate-700', 'hover:bg-blue-50', 'hover:text-blue-900', 'border-slate-200', 'shadow-sm');
+            });
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+            }
+            
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-blue-900', 'text-white', 'border-blue-900', 'shadow-md');
+                activeNav.classList.remove('bg-white', 'text-slate-700', 'hover:bg-blue-50', 'hover:text-blue-900', 'border-slate-200', 'shadow-sm');
+            }
+
+            if (tabId === 'dashboard') {
+                renderRecordsTable();
+            } else if (tabId === 'galeri') {
+                renderGallery();
+            }
+        }
+
+        function filterGallery(category) {
+            activeGalleryFilter = category;
+            
+            document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+                btn.className = 'gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100';
+            });
+
+            let activeBtnId = 'filter-btn-semua';
+            if (category === 'Learning Walk') activeBtnId = 'filter-btn-lw';
+            else if (category === 'Peer Coaching') activeBtnId = 'filter-btn-pc';
+            else if (category === 'Lesson Study') activeBtnId = 'filter-btn-ls';
+            else if (category === 'Teacher Sharing Session') activeBtnId = 'filter-btn-tss';
+
+            const btn = document.getElementById(activeBtnId);
+            if (btn) {
+                btn.className = 'gallery-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-900 text-white shadow-sm border border-blue-900';
+            }
+
+            renderGallery();
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('gallery-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let allPhotos = [...sampleGalleryImages];
+
+            records.forEach(r => {
+                [r.img1, r.img2, r.img3].forEach((img) => {
+                    if (img && img.trim() !== '') {
+                        allPhotos.unshift({
+                            title: `${r.alat} - ${r.guru}`,
+                            cat: r.alat,
+                            guru: r.guru,
+                            date: r.tarikh,
+                            url: img
+                        });
+                    }
+                });
+            });
+
+            if (activeGalleryFilter !== 'semua') {
+                allPhotos = allPhotos.filter(p => p.cat.toLowerCase().includes(activeGalleryFilter.toLowerCase()));
+            }
+
+            if (allPhotos.length === 0) {
+                container.innerHTML = `<div class="col-span-full p-8 text-center text-slate-500 bg-white rounded-xl border border-slate-200">Tiada gambar dijumpai bagi kategori ini.</div>`;
+                return;
+            }
+
+            allPhotos.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer group";
+                card.onclick = () => openLightbox(p.url, p.title, `Oleh: ${p.guru} • Tarikh: ${p.date}`);
+
+                card.innerHTML = `
+                    <div class="aspect-video bg-slate-100 overflow-hidden relative">
+                        <img src="${p.url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x225?text=Foto+PLC';">
+                        <div class="absolute inset-0 bg-blue-900/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="bg-white/90 text-blue-950 px-3 py-1 rounded-full text-xs font-bold shadow">🔎 Lihat Gambar</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded mb-1">${p.cat.split('(')[0]}</span>
+                        <h4 class="font-bold text-xs text-slate-800 line-clamp-1">${p.title}</h4>
+                        <p class="text-[11px] text-slate-500 mt-1">${p.guru}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openLightbox(url, title, desc) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-title').innerText = title;
+            document.getElementById('lightbox-desc').innerText = desc;
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            document.getElementById('lightbox-img').src = '';
+        }
+
+        function showToolDetail(index) {
+            const tool = toolDetails[index];
+            if (!tool) return;
+
+            const container = document.getElementById('tool-detail-card');
+            if (!container) return;
+
+            document.querySelectorAll('.tool-tab-btn').forEach(btn => btn.classList.remove('border-blue-900', 'bg-blue-50', 'ring-2', 'ring-blue-900/20'));
+            const activeBtn = document.getElementById(`tool-btn-${index}`);
+            if (activeBtn) {
+                activeBtn.classList.add('border-blue-900', 'bg-blue-50', 'ring-2', 'ring-blue-900/20');
+            }
+
+            let dynamicHtml = `
+                <div class="flex flex-col md:flex-row justify-between items-start border-b pb-4 mb-6 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-blue-900">${tool.bm}</h3>
+                        <p class="text-xs font-semibold text-emerald-600 uppercase tracking-widest">${tool.en}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-7 space-y-6">
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center space-x-2">
+                                <span>❓</span> <span>Apa itu ${tool.bm.split('.')[1] ? tool.bm.split('.')[1].trim() : tool.bm}?</span>
+                            </h4>
+                            <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">${tool.whatIs}</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center space-x-2">
+                                <span>🎯</span> <span>Objektif Utama</span>
+                            </h4>
+                            <ul class="list-disc list-inside text-sm text-slate-700 space-y-1 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+                                ${tool.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                            </ul>
+                        </div>
+            `;
+
+            if (tool.focusTitle) {
+                dynamicHtml += `
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <h4 class="font-bold text-blue-900 text-sm mb-2">${tool.focusTitle}</h4>
+                        ${tool.focusSteps ? `<ul class="list-disc list-inside text-sm text-slate-700 space-y-1.5 mb-2">${tool.focusSteps.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+                        ${tool.focusText ? `<p class="text-sm text-slate-700 mb-2">${tool.focusText}</p>` : ''}
+                    </div>
+                `;
+            }
+
+            if (tool.phases) {
+                dynamicHtml += `
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <span>🔄</span> <span>Fasa Pelaksanaan</span>
+                        </h4>
+                        ${tool.phases.map(p => `
+                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm">
+                                <h5 class="font-bold text-blue-900 mb-1">${p.title}</h5>
+                                <p class="text-slate-700">${p.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (tool.stepsList) {
+                dynamicHtml += `
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <span>📋</span> <span>Langkah Pelaksanaan</span>
+                        </h4>
+                        ${tool.stepsList.map(st => `
+                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm">
+                                <h5 class="font-bold text-blue-900 mb-1">${st.t}</h5>
+                                <p class="text-slate-700">${st.d}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (tool.models) {
+                dynamicHtml += `
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-900 text-sm mb-2">3 Model Peer Coaching:</h4>
+                        <ul class="list-disc list-inside text-sm text-purple-900 space-y-1 font-medium">
+                            ${tool.models.map(m => `<li>${m}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (tool.improveTitle) {
+                dynamicHtml += `
+                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                        <h4 class="font-bold text-emerald-900 text-sm mb-2">${tool.improveTitle}</h4>
+                        <p class="text-sm text-slate-700 mb-2">${tool.improveText}</p>
+                    </div>
+                `;
+            }
+
+            if (tool.shareTitle) {
+                dynamicHtml += `
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                        <h4 class="font-bold text-amber-900 text-sm mb-2">${tool.shareTitle}</h4>
+                        <p class="text-sm text-slate-700">${tool.shareText}</p>
+                    </div>
+                `;
+            }
+
+            if (tool.exampleTitle) {
+                dynamicHtml += `
+                    <div class="bg-slate-100 p-4 rounded-lg border border-slate-300">
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${tool.exampleTitle}</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">${tool.exampleText}</p>
+                    </div>
+                `;
+            }
+
+            if (tool.keyNote) {
+                dynamicHtml += `
+                    <div class="p-3 bg-blue-900 text-white rounded-lg text-xs font-bold text-center tracking-wide shadow-sm whitespace-pre-line">
+                        ${tool.keyNote}
+                    </div>
+                `;
+            }
+
+            dynamicHtml += `
+                    </div>
+
+                    <div class="lg:col-span-5 flex flex-col items-center sticky top-24">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center w-full shadow-sm">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">INFOGRAFIK ALAT KOLABORATIF</h4>
+                            <div class="w-full bg-white rounded-lg border border-slate-200 overflow-hidden p-2 flex items-center justify-center">
+                                <img src="${tool.img}" alt="${tool.bm}" class="w-full h-auto max-h-[500px] object-contain rounded transition transform hover:scale-105 duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x500/1e3a8a/ffffff?text=Infografik+${encodeURIComponent(tool.bm)}';">
+                            </div>
+                            <p class="text-xs text-slate-500 mt-3 italic">Carta Panduan Rasmi PLC KPM SKP7</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t flex justify-end">
+                    <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2 shadow">
+                        <span>🏠</span>
+                        <span>Kembali ke Muka Utama</span>
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = dynamicHtml;
+        }
+
+        function populateAllTeachersDropdown() {
+            const select = document.getElementById('input-disediakan');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+            const allTeachers = [];
+
+            Object.values(teacherData).forEach(list => {
+                list.forEach(t => {
+                    if (!allTeachers.includes(t)) {
+                        allTeachers.push(t);
+                    }
+                });
+            });
+
+            allTeachers.sort().forEach(guru => {
+                const opt = document.createElement('option');
+                opt.value = guru;
+                opt.textContent = guru;
+                select.appendChild(opt);
+            });
+        }
+
+        function updateTeacherDropdown() {
+            const panitiaSelect = document.getElementById('input-panitia');
+            const guruSelect = document.getElementById('input-guru');
+            if (!panitiaSelect || !guruSelect) return;
+
+            const selectedPanitia = panitiaSelect.value;
+            guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+
+            if (selectedPanitia && teacherData[selectedPanitia]) {
+                teacherData[selectedPanitia].forEach(guru => {
+                    const opt = document.createElement('option');
+                    opt.value = guru;
+                    opt.innerText = guru;
+                    guruSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function previewImage(input, targetId) {
+            const file = input.files[0];
+            const preview = document.getElementById(targetId);
+            const label = document.getElementById(`${targetId}-label`);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    if (label) label.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const statusRadio = document.querySelector('input[name="status-hantar"]:checked');
+            const selectedStatus = statusRadio ? statusRadio.value : 'Hantar';
+
+            const newRecord = {
+                id: Date.now(),
+                alat: document.getElementById('input-alat').value,
+                panitia: document.getElementById('input-panitia').value,
+                guru: document.getElementById('input-guru').value,
+                disediakan: document.getElementById('input-disediakan').value,
+                kelas: document.getElementById('input-kelas').value,
+                tarikh: document.getElementById('input-tarikh').value,
+                masa: document.getElementById('input-masa').value,
+                data: document.getElementById('input-pengumpulan-data').value,
+                fokus: document.getElementById('input-fokus').value,
+                improve: document.getElementById('input-improve').value,
+                share: document.getElementById('input-share').value,
+                status: selectedStatus,
+                img1: document.getElementById('preview-1').src || '',
+                img2: document.getElementById('preview-2').src || '',
+                img3: document.getElementById('preview-3').src || ''
+            };
+
+            records.push(newRecord);
+            try {
+                localStorage.setItem('skp7_plc_records', JSON.stringify(records));
+            } catch (err) {
+                console.error("Gagal menyimpan ke LocalStorage:", err);
+            }
+
+            if (selectedStatus === 'Hantar') {
+                alert('BERJAYA: Rekod OPR telah berjaya DIHANTAR dan DISIMPAN ke dalam Dashboard Rekod!');
+            } else {
+                alert('DIKEMAS KINI: Rekod OPR telah disimpan dengan Status "TIDAK HANTAR" ke dalam Dashboard Rekod.');
+            }
+
+            document.getElementById('opr-form').reset();
+            
+            ['preview-1', 'preview-2', 'preview-3'].forEach(id => {
+                const img = document.getElementById(id);
+                if (img) {
+                    img.src = '';
+                    img.classList.add('hidden');
+                }
+                const lbl = document.getElementById(`${id}-label`);
+                if (lbl) lbl.classList.remove('hidden');
+            });
+
+            switchTab('dashboard');
+        }
+
+        function renderRecordsTable() {
+            const tbody = document.getElementById('records-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Tiada rekod disimpan.</td></tr>`;
+                return;
+            }
+
+            records.forEach((rec, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+
+                const statusColor = rec.status === 'Hantar' 
+                    ? 'text-emerald-700 bg-emerald-100 border-emerald-300' 
+                    : 'text-red-700 bg-red-100 border-red-300';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-900">${idx + 1}</td>
+                    <td class="p-3 text-xs">${rec.tarikh}<br><span class="text-slate-500">${rec.masa}</span></td>
+                    <td class="p-3 font-semibold text-blue-900">${rec.alat}</td>
+                    <td class="p-3 text-xs">${rec.panitia}</td>
+                    <td class="p-3 font-medium text-slate-800">${rec.guru}</td>
+                    <td class="p-3 text-xs">${rec.kelas}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded border ${statusColor}">
+                            ${rec.status === 'Hantar' ? '✓ HANTAR' : '✕ TIDAK HANTAR'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="printOPR(${rec.id})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs rounded font-medium shadow-sm transition">
+                            Cetak OPR
+                        </button>
+                        ${isJU ? `<button onclick="deleteRecord(${rec.id})" class="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white text-xs rounded font-medium shadow-sm transition">Padam</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteRecord(id) {
+            records = records.filter(r => r.id !== id);
+            try {
+                localStorage.setItem('skp7_plc_records', JSON.stringify(records));
+            } catch (err) {
+                console.error("Gagal mengemaskini LocalStorage:", err);
+            }
+            renderRecordsTable();
+        }
+
+        function openAuthModal() {
+            if (isJU) {
+                isJU = false;
+                document.getElementById('role-badge').innerText = 'Mod: Guru';
+                document.getElementById('role-badge').className = 'px-3 py-1 text-xs font-semibold rounded-full bg-emerald-600 text-white border border-emerald-400 shadow-sm';
+                document.getElementById('btn-toggle-role').innerText = 'Tukar Mod (JU)';
+                renderRecordsTable();
+            } else {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('ju-password-input').value = '';
+        }
+
+        function verifyJU() {
+            const pwd = document.getElementById('ju-password-input').value;
+            if (pwd === 'juplcskp7') {
+                isJU = true;
+                document.getElementById('role-badge').innerText = 'Mod: Jurulatih Utama (JU)';
+                document.getElementById('role-badge').className = 'px-3 py-1 text-xs font-semibold rounded-full bg-blue-600 text-white border border-blue-400 shadow-sm';
+                document.getElementById('btn-toggle-role').innerText = 'Tukar Mod (Guru)';
+                closeAuthModal();
+                renderRecordsTable();
+            } else {
+                alert('Kata laluan salah! Sila cuba lagi.');
+            }
+        }
+
+        function printOPR(recordId) {
+            const rec = records.find(r => r.id === recordId);
+            if (!rec) return;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Sila benarkan pop-up window untuk mencetak laporan OPR.');
+                return;
+            }
+
+            const printHTML = `
+            <!DOCTYPE html>
+            <html lang="ms">
+            <head>
+                <meta charset="UTF-8">
+                <title>OPR PLC - ${rec.guru} - SK (F) Palong 7</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial, sans-serif; color: #111; line-height: 1.4; margin: 0; padding: 0; background: #fff; }
+                    .a4-container { width: 210mm; min-height: 297mm; box-sizing: border-box; margin: auto; }
+                    .header-table { width: 100%; border-collapse: collapse; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 12px; }
+                    .header-table td { vertical-align: middle; }
+                    .logo-img { height: 60px; width: auto; }
+                    .header-title { text-align: left; padding-left: 12px; }
+                    .header-title h1 { margin: 0; font-size: 16pt; color: #1e3a8a; text-transform: uppercase; }
+                    .header-title h2 { margin: 2px 0 0 0; font-size: 11pt; color: #059669; }
+                    .section-title { background-color: #1e3a8a; color: white; font-weight: bold; font-size: 10pt; padding: 4px 8px; margin-top: 10px; margin-bottom: 6px; text-transform: uppercase; }
+                    table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 9.5pt; }
+                    table.data-table th, table.data-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
+                    table.data-table th { background-color: #f1f5f9; width: 28%; font-weight: bold; }
+                    .process-box { border: 1px solid #94a3b8; padding: 6px 8px; margin-bottom: 6px; font-size: 9.5pt; }
+                    .process-box strong { color: #1e3a8a; display: block; margin-bottom: 2px; }
+                    .image-grid { display: table; width: 100%; table-layout: fixed; margin-top: 8px; }
+                    .image-col { display: table-cell; width: 33.33%; padding: 4px; text-align: center; vertical-align: top; }
+                    .img-frame { border: 1px solid #cbd5e1; height: 110px; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; }
+                    .img-frame img { max-width: 100%; max-height: 100%; object-fit: cover; }
+                    .footer-sign { margin-top: 25px; width: 100%; font-size: 9pt; }
+                    .footer-sign td { width: 50%; vertical-align: top; }
+                </style>
+            </head>
+            <body>
+                <div class="a4-container">
+                    <table class="header-table">
+                        <tr>
+                            <td style="width: 70px;">
+                                <img src="https://iili.io/nd21GB1.md.jpg" class="logo-img" alt="SKP7 Logo">
+                            </td>
+                            <td class="header-title">
+                                <h1>SK (F) PALONG 7</h1>
+                                <h2>ONE PAGE REPORT (OPR) - PROGRAM PLC 2026</h2>
+                                <div style="font-size: 8pt; color: #475569;">PPD PEJABAT PENDIDIKAN DAERAH</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">1. MAKLUMAT PENCERAPAN & PROGRAM</div>
+                    <table class="data-table">
+                        <tr><th>ALAT KOLABORASI</th><td>${rec.alat}</td></tr>
+                        <tr><th>PANITIA</th><td>${rec.panitia}</td></tr>
+                        <tr><th>NAMA GURU DICERAP</th><td>${rec.guru}</td></tr>
+                        <tr><th>KELAS</th><td>${rec.kelas}</td></tr>
+                        <tr><th>TARIKH & MASA</th><td>${rec.tarikh} (${rec.masa})</td></tr>
+                        <tr><th>PENGUMPULAN DATA</th><td>${rec.data}</td></tr>
+                        <tr><th>STATUS HANTAR</th><td><strong>${rec.status}</strong></td></tr>
+                    </table>
+
+                    <div class="section-title">2. PROSES PELAKSANAAN ALAT KOLABORASI</div>
+                    <div class="process-box"><strong>FOKUS (FOCUS):</strong>${rec.fokus || '-'}</div>
+                    <div class="process-box"><strong>PENAMBAHBAIKAN (IMPROVE):</strong>${rec.improve || '-'}</div>
+                    <div class="process-box"><strong>PERKONGSIAN (SHARE):</strong>${rec.share || '-'}</div>
+
+                    <div class="section-title">3. GAMBAR PELAKSANAAN</div>
+                    <div class="image-grid">
+                        <div class="image-col">
+                            <div class="img-frame">${rec.img1 ? `<img src="${rec.img1}">` : '<span style="font-size:8pt;color:#94a3b8;">Gambar 1</span>'}</div>
+                        </div>
+                        <div class="image-col">
+                            <div class="img-frame">${rec.img2 ? `<img src="${rec.img2}">` : '<span style="font-size:8pt;color:#94a3b8;">Gambar 2</span>'}</div>
+                        </div>
+                        <div class="image-col">
+                            <div class="img-frame">${rec.img3 ? `<img src="${rec.img3}">` : '<span style="font-size:8pt;color:#94a3b8;">Gambar 3</span>'}</div>
+                        </div>
+                    </div>
+
+                    <table class="footer-sign">
+                        <tr>
+                            <td>
+                                Disediakan oleh:<br><br><br>
+                                _______________________<br>
+                                <strong>(${rec.disediakan || rec.guru})</strong><br>
+                                Guru Subjek / Ahli PLC
+                            </td>
+                            <td style="text-align: right;">
+                                Disahkan oleh:<br><br><br>
+                                _______________________<br>
+                                <strong>(JURULATIH UTAMA PLC SKP7)</strong><br>
+                                SK (F) Palong 7
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </body>
+            </html>
+            `;
+
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 300);
+        }
+
+        window.onload = function() {
+            showToolDetail(1);
+            populateAllTeachersDropdown();
+        };
+    </script>
+</body>
+</html>
