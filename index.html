@@ -52,6 +52,9 @@
 
             <!-- Header Right: User Role & Action -->
             <div class="flex items-center space-x-3">
+                <div id="db-status-badge" class="hidden sm:inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500 text-slate-900 border border-amber-300 shadow-sm">
+                    🟡 Storage Tempatan
+                </div>
                 <div id="role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-600 text-white border border-emerald-400 shadow-sm">
                     Mod: Guru
                 </div>
@@ -62,7 +65,7 @@
         </div>
     </header>
 
-    <!-- NAVIGATION TABS (KOTAK-KOTAK TAB BER-EMOJI) -->
+    <!-- NAVIGATION TABS -->
     <nav class="bg-slate-100 border-b border-slate-200 py-3 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 sm:space-x-3 overflow-x-auto">
             <button onclick="switchTab('launch')" id="nav-launch" class="nav-btn py-2.5 px-4 rounded-xl font-semibold text-sm bg-blue-900 text-white border border-blue-900 shadow-md flex items-center space-x-2 whitespace-nowrap transition-all duration-200 transform active:scale-95">
@@ -270,6 +273,11 @@
                 <p class="text-sm text-slate-600">Sila isi maklumat pencerapan / program PLC di bawah dengan lengkap dan tekan butang simpan di bahagian bawah borang.</p>
             </div>
 
+            <!-- Dynamic Cloud Connection Alert Banner -->
+            <div id="form-cloud-alert" class="p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs rounded shadow-sm">
+                ℹ️ <strong>Nota Penyambungan:</strong> Sistem sedang beroperasi dalam mod simpanan tempatan. Untuk membolehkan guru lain melihat laporan yang dihantar secara dalam talian (*Live Online*), pastikan sambungan Firestore/Database sekolah diaktifkan.
+            </div>
+
             <form id="opr-form" onsubmit="handleFormSubmit(event)" class="bg-white p-6 sm:p-8 rounded-lg border border-slate-200 shadow-md space-y-6">
                 
                 <!-- Section 1: Maklumat Asas -->
@@ -378,11 +386,14 @@
 
                 <!-- Section 3: Gambar Pelaksanaan -->
                 <div>
-                    <h3 class="text-base font-bold text-blue-900 border-b pb-2 mb-4">3. GAMBAR PELAKSANAAN (3 GAMBAR)</h3>
+                    <div class="flex justify-between items-center border-b pb-2 mb-4">
+                        <h3 class="text-base font-bold text-blue-900">3. GAMBAR PELAKSANAAN (3 GAMBAR)</h3>
+                        <span class="text-[11px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold">⚡ Auto-Compressed (Saiz Optima)</span>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 1</label>
-                            <input type="file" id="img-input-1" accept="image/*" onchange="previewImage(this, 'preview-1')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <input type="file" id="img-input-1" accept="image/*" onchange="previewAndCompressImage(this, 'preview-1')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                             <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
                                 <img id="preview-1" class="hidden w-full h-full object-cover">
                                 <span id="preview-1-label" class="text-xs text-slate-400">Tiada Gambar</span>
@@ -390,7 +401,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 2</label>
-                            <input type="file" id="img-input-2" accept="image/*" onchange="previewImage(this, 'preview-2')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <input type="file" id="img-input-2" accept="image/*" onchange="previewAndCompressImage(this, 'preview-2')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                             <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
                                 <img id="preview-2" class="hidden w-full h-full object-cover">
                                 <span id="preview-2-label" class="text-xs text-slate-400">Tiada Gambar</span>
@@ -398,7 +409,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 3</label>
-                            <input type="file" id="img-input-3" accept="image/*" onchange="previewImage(this, 'preview-3')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                            <input type="file" id="img-input-3" accept="image/*" onchange="previewAndCompressImage(this, 'preview-3')" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                             <div class="mt-2 aspect-video bg-slate-100 border rounded flex items-center justify-center overflow-hidden">
                                 <img id="preview-3" class="hidden w-full h-full object-cover">
                                 <span id="preview-3-label" class="text-xs text-slate-400">Tiada Gambar</span>
@@ -445,7 +456,7 @@
 
                         <!-- Butang Simpan Rekod OPR -->
                         <div class="flex flex-col items-stretch md:items-end space-y-2">
-                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base py-3.5 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 border border-emerald-400 flex items-center justify-center space-x-2">
+                            <button type="submit" id="btn-submit-opr" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base py-3.5 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 border border-emerald-400 flex items-center justify-center space-x-2">
                                 <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                                     <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                                 </svg>
@@ -458,7 +469,7 @@
                     <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-xs text-amber-900 flex items-start space-x-2">
                         <span class="font-bold text-amber-700">⚠️ PERINGATAN IMPORTANT:</span>
                         <span>
-                            Sila pastikan anda menekan butang <strong>"SIMPAN REKOD OPR"</strong> di atas. Jika tidak menekan butang simpan ini, segala maklumat dan data yang telah diisi <strong>TIDAK AKAN DIHANTAR ATAU DISIMPAN</strong> ke dalam Rekod Simpanan Dashboard.
+                            Sila pastikan anda menekan butang <strong>"SIMPAN REKOD OPR"</strong> di atas. Jika tidak menekan butang simpan ini, segala maklumat dan data yang telah diisi <strong>TIDAK AKAN DIHANTAR ATAU DISIMPAN</strong>.
                         </span>
                     </div>
 
@@ -482,9 +493,14 @@
                     <h2 class="text-2xl font-bold text-blue-900">Dashboard Rekod OPR</h2>
                     <p class="text-sm text-slate-600">Senarai penuh rekod pencerapan PLC yang telah dihantar / disimpan. Sesiapa sahaja boleh melihat butiran penuh borang.</p>
                 </div>
-                <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded text-sm shadow transition">
-                    Cetak Dashboard
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="renderRecordsTable()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded border border-slate-300 transition flex items-center space-x-1">
+                        <span>🔄 Segarkan (Refresh)</span>
+                    </button>
+                    <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded text-sm shadow transition">
+                        Cetak Dashboard
+                    </button>
+                </div>
             </div>
 
             <!-- Record Table -->
@@ -609,7 +625,7 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP NOTIFIKASI TERSUAI (REPLACE ALERT) -->
+    <!-- MODAL POPUP NOTIFIKASI TERSUAI -->
     <div id="custom-alert-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl p-6 max-w-md w-full border border-slate-200 shadow-2xl relative text-center">
             <div id="alert-icon" class="text-4xl mb-3">✅</div>
@@ -621,7 +637,7 @@
         </div>
     </div>
 
-    <!-- MODAL PAPARAN BUTIRAN PENUH OPR (DETAIL MODAL) -->
+    <!-- MODAL PAPARAN BUTIRAN PENUH OPR -->
     <div id="opr-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
             <button onclick="closeOprDetailModal()" class="absolute top-4 right-4 bg-slate-100 text-slate-600 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition">✕</button>
@@ -673,7 +689,7 @@
         </div>
     </div>
 
-    <!-- MODAL PENGESAHAN PADAM (DELETE CONFIRM MODAL) -->
+    <!-- MODAL PENGESAHAN PADAM -->
     <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl text-center">
             <div class="text-4xl mb-3">⚠️</div>
@@ -706,22 +722,46 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Setup Config Firebase
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'skp7-plc-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-key",
-            authDomain: "demo.firebaseapp.com",
-            projectId: "demo-project",
-            storageBucket: "demo.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:demo"
-        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
 
         let db = null;
         let auth = null;
-        let pendingDeleteId = null;
+        window.isCloudConnected = false;
+
+        function updateStatusUI(isOnline) {
+            window.isCloudConnected = isOnline;
+            const badge = document.getElementById('db-status-badge');
+            const alertBox = document.getElementById('form-cloud-alert');
+
+            if (badge) {
+                if (isOnline) {
+                    badge.innerHTML = '🟢 Cloud Database Active';
+                    badge.className = 'hidden sm:inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500 text-white border border-emerald-300 shadow-sm';
+                } else {
+                    badge.innerHTML = '🟡 Storage Tempatan';
+                    badge.className = 'hidden sm:inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500 text-slate-900 border border-amber-300 shadow-sm';
+                }
+            }
+
+            if (alertBox) {
+                if (isOnline) {
+                    alertBox.innerHTML = `🟢 <strong>Live Cloud Active:</strong> Sebarang rekod yang anda isi akan terus terpapar secara masa-nyata (Real-time) di semua telefon dan komputer guru lain.`;
+                    alertBox.className = 'p-3 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-900 text-xs rounded shadow-sm';
+                } else {
+                    alertBox.innerHTML = `⚠️ <strong>Penyimpanan Tempatan (Offline Mode):</strong> Data kini disimpan di telefon ini sahaja. Jika mahu guru lain melihat laporan secara langsung, sila pastikan pangkalan data awan (Firebase Config) dikonfigurasikan.`;
+                    alertBox.className = 'p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs rounded shadow-sm';
+                }
+            }
+        }
 
         async function initFirebaseSync() {
+            if (!firebaseConfig || firebaseConfig.apiKey === "demo-key") {
+                console.warn("Sistem menggunakan penyimpan tempatan (Local Storage Mode).");
+                updateStatusUI(false);
+                return;
+            }
+
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -733,7 +773,6 @@
                     await signInAnonymously(auth);
                 }
 
-                // Path Firestore Strict Rule: /artifacts/{appId}/public/data/opr_records
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'opr_records');
                 
                 onSnapshot(colRef, (snapshot) => {
@@ -761,19 +800,25 @@
                         });
                     });
 
-                    // Susun mengikut tarikh/Masa terkini di atas
                     cloudRecords.sort((a, b) => (b.id || 0) - (a.id || 0));
                     window.records = cloudRecords;
-                    localStorage.setItem('skp7_plc_records', JSON.stringify(cloudRecords));
+                    try {
+                        localStorage.setItem('skp7_plc_records', JSON.stringify(cloudRecords));
+                    } catch(e) {
+                        console.warn("Storage Penuh di Local Browser.");
+                    }
                     
+                    updateStatusUI(true);
                     if (window.renderRecordsTable) window.renderRecordsTable();
                     if (window.renderGallery) window.renderGallery();
                 }, (error) => {
-                    console.warn("Firestore snapshot listen mode fallback strictly to local storage:", error);
+                    console.warn("Cloud Firestore tidak terhubung, bertukar ke LocalStorage:", error);
+                    updateStatusUI(false);
                 });
 
             } catch (err) {
-                console.warn("Firebase tidak diakses, mod LocalStorage digunakan:", err);
+                console.warn("Firebase Init Error, LocalStorage diguna:", err);
+                updateStatusUI(false);
             }
         }
 
@@ -785,7 +830,7 @@
                     return true;
                 }
             } catch (e) {
-                console.error("Gagal simpan ke Cloud Firestore, simpan secara tempatan:", e);
+                console.error("Gagal simpan ke Cloud Firestore:", e);
             }
             return false;
         };
@@ -986,24 +1031,81 @@
                 ],
                 focusTitle: "🔵 FOCUS",
                 focusSteps: [
-                    "① ANALISIS MASALAH: Kenal pasti masalah berdasarkan PBD, latihan, pemerhatian, ujian, kehadiran, soal selidik, atau Student Voice. Pastikan spesifik (❌ 'Murid lemah Bahasa Arab' -> ✅ '15 daripada 25 murid Tahun 4 masih gagal mengingat sekurang-kurangnya 8 daripada 12 kosa kata Unit 3').",
-                    "② JANA PILIHAN: Senaraikan sebanyak mungkin cadangan penyelesaian (gamifikasi, flashcard, peer learning, retrieval practice, digital quiz, intervensi kumpulan kecil).",
+                    "① ANALISIS MASALAH: Kenal pasti masalah berdasarkan PBD, latihan, pemerhatian, ujian, kehadiran, soal selidik, atau Student Voice. Pastikan spesifik.",
+                    "② JANA PILIHAN: Senaraikan sebanyak mungkin cadangan penyelesaian (gamifikasi, flashcard, peer learning, digital quiz, dll).",
                     "③ NILAI KESAN: Pertimbangkan manfaat, masa, sumber, risiko, kebolehlaksanaan & kesesuaian dengan murid.",
                     "④ LAKSANA: Pilih cadangan terbaik dan jalankan intervensi."
                 ],
                 improveTitle: "🟢 IMPROVE",
-                improveText: "⑤ REFLEKSI: Bandingkan data sebelum dan selepas tindakan. Tanya:\n• Adakah masalah berkurang?\n• Adakah objektif tercapai?\n• Strategi mana paling berkesan?\n• Apa yang perlu diubah?\nJika belum berjaya, kumpulan membuat penambahbaikan dan mencuba tindakan seterusnya.",
+                improveText: "⑤ REFLEKSI: Bandingkan data sebelum dan selepas tindakan. Tanya:\n• Adakah masalah berkurang?\n• Adakah objektif tercapai?\n• Strategi mana paling berkesan?\nJika belum berjaya, kumpulan membuat penambahbaikan dan mencuba tindakan seterusnya.",
                 shareTitle: "🟠 SHARE",
                 shareText: "⑥ SEBAR AMALAN: Jika strategi menunjukkan kesan positif, kongsi masalah asal, tindakan, bukti/data, hasil & strategi yang berjaya kepada guru lain.",
                 keyNote: "📌 Formula mudah:\nMASALAH → PUNCA → PILIHAN → TINDAKAN → IMPAK → KONGSI"
             }
         };
 
+        // FUNGSI MAMPATAN GAMBAR (IMAGE AUTO-COMPRESSOR)
+        function compressImageFile(file, maxWidth = 800, maxHeight = 800, quality = 0.6) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
+                    };
+                    img.onerror = (err) => reject(err);
+                };
+                reader.onerror = (err) => reject(err);
+            });
+        }
+
+        async function previewAndCompressImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                try {
+                    const compressedBase64 = await compressImageFile(input.files[0], 800, 800, 0.6);
+                    const img = document.getElementById(previewId);
+                    const label = document.getElementById(`${previewId}-label`);
+                    if (img) {
+                        img.src = compressedBase64;
+                        img.classList.remove('hidden');
+                    }
+                    if (label) {
+                        label.classList.add('hidden');
+                    }
+                } catch (e) {
+                    console.error("Gagal mampatkan gambar:", e);
+                }
+            }
+        }
+
         function showToolDetail(toolNum) {
             const data = toolDetails[toolNum];
             if (!data) return;
 
-            // Update active state on sub-navigation buttons
             for (let i = 1; i <= 6; i++) {
                 const btn = document.getElementById(`tool-btn-${i}`);
                 if (btn) {
@@ -1162,25 +1264,6 @@
             });
         }
 
-        function previewImage(input, previewId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(previewId);
-                    const label = document.getElementById(`${previewId}-label`);
-                    if (img) {
-                        img.src = e.target.result;
-                        img.classList.remove('hidden');
-                    }
-                    if (label) {
-                        label.classList.add('hidden');
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // Memuatkan rekod daripada LocalStorage jika Firebase belum diselaraskan
         window.records = [];
         try {
             const savedRecords = localStorage.getItem('skp7_plc_records');
@@ -1319,6 +1402,12 @@
         async function handleFormSubmit(e) {
             e.preventDefault();
 
+            const submitBtn = document.getElementById('btn-submit-opr');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "⏳ MEMPROSES REKOD...";
+            }
+
             const statusRadio = document.querySelector('input[name="status-hantar"]:checked');
             const selectedStatus = statusRadio ? statusRadio.value : 'Hantar';
 
@@ -1341,29 +1430,33 @@
                 img3: document.getElementById('preview-3').src || ''
             };
 
-            // Simpan ke senarai setempat dahulu
             if (!window.records) window.records = [];
             window.records.unshift(newRecord);
+
+            let isCloudSaved = false;
+            if (window.saveRecordToCloud) {
+                isCloudSaved = await window.saveRecordToCloud(newRecord);
+            }
 
             try {
                 localStorage.setItem('skp7_plc_records', JSON.stringify(window.records));
             } catch (err) {
-                console.error("Gagal menyimpan ke LocalStorage:", err);
+                console.warn("LocalStorage Kuota Penuh:", err);
             }
 
-            // Hantar ke Cloud Firestore jika terhubung
-            if (window.saveRecordToCloud) {
-                await window.saveRecordToCloud(newRecord);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "SIMPAN REKOD OPR";
             }
 
-            // Notifikasi Kejayaan
             showCustomAlert(
                 'BERJAYA DISIMPAN!',
-                `Rekod OPR oleh ${newRecord.guru} telah berjaya dimasukkan terus ke dalam Dashboard Rekod OPR.`,
+                isCloudSaved || window.isCloudConnected
+                    ? `Rekod OPR oleh ${newRecord.guru} telah berjaya dimasukkan ke dalam Cloud Firestore & Dashboard secara LIVE!`
+                    : `Rekod OPR oleh ${newRecord.guru} telah disimpan secara tempatan pada peranti ini.`,
                 '🎉'
             );
 
-            // Resets form & previews
             document.getElementById('opr-form').reset();
             
             ['preview-1', 'preview-2', 'preview-3'].forEach(id => {
@@ -1376,7 +1469,6 @@
                 if (lbl) lbl.classList.remove('hidden');
             });
 
-            // TERUS BAWA PENGGUNA KE TAB DASHBOARD REKOD
             switchTab('dashboard');
         }
 
