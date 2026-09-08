@@ -480,7 +480,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-blue-900">Dashboard Rekod OPR</h2>
-                    <p class="text-sm text-slate-600">Senarai penuh rekod pencerapan PLC yang telah dihantar / disimpan.</p>
+                    <p class="text-sm text-slate-600">Senarai penuh rekod pencerapan PLC yang telah dihantar / disimpan. Sesiapa sahaja boleh melihat butiran penuh borang.</p>
                 </div>
                 <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded text-sm shadow transition">
                     Cetak Dashboard
@@ -600,11 +600,88 @@
         <div class="bg-white rounded-xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl relative">
             <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 font-bold">✕</button>
             <h3 class="text-lg font-bold text-blue-900 mb-2">Pengesahan Mod JU</h3>
-            <p class="text-xs text-slate-600 mb-4">Sila masukkan kata laluan Jurulatih Utama (JU) untuk mengakses kebenaran khas.</p>
+            <p class="text-xs text-slate-600 mb-4">Sila masukkan kata laluan Jurulatih Utama (JU) untuk mengakses kebenaran khas (termasuk fungsi padam rekod).</p>
             <input type="password" id="ju-password-input" placeholder="Masukkan Kata Laluan" class="w-full border border-slate-300 rounded p-2 text-sm mb-4 focus:ring-2 focus:ring-blue-900 focus:outline-none">
             <div class="flex justify-end space-x-2">
                 <button onclick="closeAuthModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-semibold">Batal</button>
                 <button onclick="verifyJU()" class="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded text-xs font-semibold">Sahkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP NOTIFIKASI TERSUAI (REPLACE ALERT) -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full border border-slate-200 shadow-2xl relative text-center">
+            <div id="alert-icon" class="text-4xl mb-3">✅</div>
+            <h3 id="alert-title" class="text-lg font-bold text-slate-800 mb-2">Maklumat</h3>
+            <p id="alert-message" class="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed"></p>
+            <button onclick="closeCustomAlert()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded-lg text-xs transition">
+                OK / Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL PAPARAN BUTIRAN PENUH OPR (DETAIL MODAL) -->
+    <div id="opr-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+            <button onclick="closeOprDetailModal()" class="absolute top-4 right-4 bg-slate-100 text-slate-600 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition">✕</button>
+            
+            <div class="border-b pb-4 mb-4">
+                <span id="detail-status-badge" class="px-3 py-1 text-xs font-bold rounded border inline-block mb-2">✓ HANTAR</span>
+                <h3 id="detail-alat" class="text-xl font-extrabold text-blue-900"></h3>
+                <p id="detail-guru-sub" class="text-xs text-slate-500 mt-1"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs mb-6">
+                <div><strong>Panitia:</strong> <span id="detail-panitia"></span></div>
+                <div><strong>Kelas:</strong> <span id="detail-kelas"></span></div>
+                <div><strong>Tarikh & Masa:</strong> <span id="detail-tarikh-masa"></span></div>
+                <div><strong>Pengumpulan Data:</strong> <span id="detail-data"></span></div>
+                <div><strong>Disediakan Oleh:</strong> <span id="detail-disediakan"></span></div>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm mb-6">
+                <div class="p-3.5 bg-blue-50/70 border-l-4 border-blue-900 rounded">
+                    <h4 class="font-bold text-blue-950 mb-1">1. FOKUS (FOCUS)</h4>
+                    <p id="detail-fokus" class="text-slate-700 whitespace-pre-line"></p>
+                </div>
+                <div class="p-3.5 bg-emerald-50/70 border-l-4 border-emerald-600 rounded">
+                    <h4 class="font-bold text-emerald-950 mb-1">2. PENAMBAHBAIKAN (IMPROVE)</h4>
+                    <p id="detail-improve" class="text-slate-700 whitespace-pre-line"></p>
+                </div>
+                <div class="p-3.5 bg-amber-50/70 border-l-4 border-amber-500 rounded">
+                    <h4 class="font-bold text-amber-950 mb-1">3. PERKONGSIAN (SHARE)</h4>
+                    <p id="detail-share" class="text-slate-700 whitespace-pre-line"></p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">GAMBAR PELAKSANAAN</h4>
+                <div id="detail-images-container" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Dynamic Photos -->
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <button id="detail-btn-print" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded text-xs transition flex items-center space-x-1.5">
+                    <span>🖨️ Cetak OPR</span>
+                </button>
+                <button onclick="closeOprDetailModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2 rounded text-xs transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PENGESAHAN PADAM (DELETE CONFIRM MODAL) -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl text-center">
+            <div class="text-4xl mb-3">⚠️</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Padam Rekod OPR?</h3>
+            <p class="text-xs text-slate-600 mb-6">Tindakan ini tidak boleh dibatalkan. Adakah anda pasti mahu memadam rekod ini daripada sistem?</p>
+            <div class="flex justify-center space-x-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-semibold">Batal</button>
+                <button id="btn-confirm-delete" class="px-5 py-2 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-bold shadow">Ya, Padam</button>
             </div>
         </div>
     </div>
@@ -623,12 +700,118 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- FIREBASE MODULE & JAVASCRIPT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Setup Config Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'skp7-plc-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-key",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+
+        let db = null;
+        let auth = null;
+        let pendingDeleteId = null;
+
+        async function initFirebaseSync() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Path Firestore Strict Rule: /artifacts/{appId}/public/data/opr_records
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'opr_records');
+                
+                onSnapshot(colRef, (snapshot) => {
+                    const cloudRecords = [];
+                    snapshot.forEach(docSnap => {
+                        const d = docSnap.data();
+                        cloudRecords.push({
+                            firestoreId: docSnap.id,
+                            id: d.id || Date.now(),
+                            alat: d.alat || '',
+                            panitia: d.panitia || '',
+                            guru: d.guru || '',
+                            disediakan: d.disediakan || '',
+                            kelas: d.kelas || '',
+                            tarikh: d.tarikh || '',
+                            masa: d.masa || '',
+                            data: d.data || '',
+                            fokus: d.fokus || '',
+                            improve: d.improve || '',
+                            share: d.share || '',
+                            status: d.status || 'Hantar',
+                            img1: d.img1 || '',
+                            img2: d.img2 || '',
+                            img3: d.img3 || ''
+                        });
+                    });
+
+                    // Susun mengikut tarikh/Masa terkini di atas
+                    cloudRecords.sort((a, b) => (b.id || 0) - (a.id || 0));
+                    window.records = cloudRecords;
+                    localStorage.setItem('skp7_plc_records', JSON.stringify(cloudRecords));
+                    
+                    if (window.renderRecordsTable) window.renderRecordsTable();
+                    if (window.renderGallery) window.renderGallery();
+                }, (error) => {
+                    console.warn("Firestore snapshot listen mode fallback strictly to local storage:", error);
+                });
+
+            } catch (err) {
+                console.warn("Firebase tidak diakses, mod LocalStorage digunakan:", err);
+            }
+        }
+
+        window.saveRecordToCloud = async function(recordData) {
+            try {
+                if (db && auth && auth.currentUser) {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'opr_records');
+                    await addDoc(colRef, recordData);
+                    return true;
+                }
+            } catch (e) {
+                console.error("Gagal simpan ke Cloud Firestore, simpan secara tempatan:", e);
+            }
+            return false;
+        };
+
+        window.deleteRecordFromCloud = async function(firestoreId) {
+            try {
+                if (db && auth && auth.currentUser && firestoreId) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'opr_records', firestoreId);
+                    await deleteDoc(docRef);
+                    return true;
+                }
+            } catch (e) {
+                console.error("Gagal padam daripada Cloud Firestore:", e);
+            }
+            return false;
+        };
+
+        initFirebaseSync();
+    </script>
+
     <script>
         let isJU = false;
         let activeGalleryFilter = 'semua';
+        let recordToDelete = null;
 
-        // Updated Teacher List by Panitia Data Model (Full Names SKP7)
+        // Guru mengikut Panitia di SKP7
         const teacherData = {
             "Bahasa Melayu": [
                 "ABDUL LATIF BIN SANUSI",
@@ -816,19 +999,211 @@
             }
         };
 
-        // Rekod dimuatkan daripada LocalStorage atau dimulakan sebagai senarai kosong
-        let records = [];
+        function showToolDetail(toolNum) {
+            const data = toolDetails[toolNum];
+            if (!data) return;
+
+            // Update active state on sub-navigation buttons
+            for (let i = 1; i <= 6; i++) {
+                const btn = document.getElementById(`tool-btn-${i}`);
+                if (btn) {
+                    if (i === toolNum) {
+                        btn.className = 'tool-tab-btn bg-blue-900 text-white border border-blue-900 p-3 rounded-xl text-left shadow-md transition';
+                    } else {
+                        btn.className = 'tool-tab-btn bg-white border border-slate-300 p-3 rounded-xl text-left hover:border-blue-900 hover:bg-blue-50/50 transition shadow-sm';
+                    }
+                }
+            }
+
+            const container = document.getElementById('tool-detail-card');
+            if (!container) return;
+
+            let html = `
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b pb-4 mb-6">
+                    <div>
+                        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full mb-2">ALAT KOLABORATIF #${toolNum}</span>
+                        <h3 class="text-2xl font-extrabold text-blue-900">${data.bm}</h3>
+                        <p class="text-xs text-slate-500 font-semibold tracking-wider uppercase">${data.en}</p>
+                    </div>
+                    ${data.img ? `<img src="${data.img}" alt="${data.bm}" class="h-20 w-auto object-contain rounded-lg border p-1 bg-white shadow-sm" onerror="this.style.display='none'">` : ''}
+                </div>
+
+                <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-sm text-blue-900 uppercase tracking-wide mb-2">📌 APA ITU ${data.en}?</h4>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">${data.whatIs}</p>
+                </div>
+            `;
+
+            if (data.objectives && data.objectives.length > 0) {
+                html += `
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm text-blue-900 uppercase tracking-wide mb-2">🎯 OBJEKTIF UTAMA:</h4>
+                        <ul class="list-disc list-inside space-y-1.5 text-xs sm:text-sm text-slate-700 bg-white p-4 rounded-xl border border-slate-200">
+                            ${data.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (data.phases) {
+                html += `
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm text-blue-900 uppercase tracking-wide mb-3">🔄 FASA PELAKSANAAN:</h4>
+                        <div class="space-y-3">
+                            ${data.phases.map(p => `
+                                <div class="p-3.5 bg-blue-50/60 border-l-4 border-blue-900 rounded-r-xl">
+                                    <h5 class="font-bold text-xs sm:text-sm text-blue-950">${p.title}</h5>
+                                    <p class="text-xs text-slate-700 mt-1 whitespace-pre-line">${p.desc}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.stepsList) {
+                html += `
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm text-blue-900 uppercase tracking-wide mb-3">📋 LANGKAH PELAKSANAAN:</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${data.stepsList.map(s => `
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                                    <h5 class="font-bold text-xs text-blue-900">${s.t}</h5>
+                                    <p class="text-xs text-slate-600 mt-1">${s.d}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.focusTitle || data.focusText || data.focusSteps) {
+                html += `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="p-4 bg-blue-50/80 border border-blue-200 rounded-xl">
+                            <h5 class="font-bold text-xs text-blue-900 mb-2">${data.focusTitle || '🔵 FOCUS'}</h5>
+                            ${data.focusSteps ? `<ul class="space-y-1 text-xs text-slate-700">${data.focusSteps.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+                            ${data.focusText ? `<p class="text-xs text-slate-700 whitespace-pre-line mt-1">${data.focusText}</p>` : ''}
+                        </div>
+
+                        <div class="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl">
+                            <h5 class="font-bold text-xs text-emerald-900 mb-2">${data.improveTitle || '🟢 IMPROVE'}</h5>
+                            ${data.improveText ? `<p class="text-xs text-slate-700 whitespace-pre-line">${data.improveText}</p>` : ''}
+                        </div>
+
+                        <div class="p-4 bg-amber-50/80 border border-amber-200 rounded-xl">
+                            <h5 class="font-bold text-xs text-amber-900 mb-2">${data.shareTitle || '🟠 SHARE'}</h5>
+                            ${data.shareText ? `<p class="text-xs text-slate-700 whitespace-pre-line">${data.shareText}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.exampleText) {
+                html += `
+                    <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-xl mb-4">
+                        <h5 class="font-bold text-xs text-indigo-900 mb-1">${data.exampleTitle || '💡 Contoh'}</h5>
+                        <p class="text-xs text-slate-700">${data.exampleText}</p>
+                    </div>
+                `;
+            }
+
+            if (data.keyNote) {
+                html += `
+                    <div class="p-3 bg-amber-100/70 text-amber-900 rounded-lg text-xs font-bold text-center border border-amber-300">
+                        ${data.keyNote.replace('\n', '<br>')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function updateTeacherDropdown() {
+            const panitiaSelect = document.getElementById('input-panitia');
+            const guruSelect = document.getElementById('input-guru');
+            if (!panitiaSelect || !guruSelect) return;
+
+            const selectedPanitia = panitiaSelect.value;
+            guruSelect.innerHTML = '';
+
+            if (!selectedPanitia || !teacherData[selectedPanitia]) {
+                guruSelect.innerHTML = '<option value="">-- Pilih Panitia Terlebih Dahulu --</option>';
+                return;
+            }
+
+            guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+            teacherData[selectedPanitia].forEach(teacher => {
+                const opt = document.createElement('option');
+                opt.value = teacher;
+                opt.textContent = teacher;
+                guruSelect.appendChild(opt);
+            });
+        }
+
+        function populateAllTeachersDropdown() {
+            const disediakansSelect = document.getElementById('input-disediakan');
+            if (!disediakansSelect) return;
+
+            disediakansSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+
+            const allTeachers = [];
+            Object.keys(teacherData).forEach(panitia => {
+                teacherData[panitia].forEach(t => {
+                    if (!allTeachers.includes(t)) allTeachers.push(t);
+                });
+            });
+
+            allTeachers.sort().forEach(teacher => {
+                const opt = document.createElement('option');
+                opt.value = teacher;
+                opt.textContent = teacher;
+                disediakansSelect.appendChild(opt);
+            });
+        }
+
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(previewId);
+                    const label = document.getElementById(`${previewId}-label`);
+                    if (img) {
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                    }
+                    if (label) {
+                        label.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Memuatkan rekod daripada LocalStorage jika Firebase belum diselaraskan
+        window.records = [];
         try {
             const savedRecords = localStorage.getItem('skp7_plc_records');
             if (savedRecords) {
-                records = JSON.parse(savedRecords);
+                window.records = JSON.parse(savedRecords);
             }
         } catch (e) {
             console.error('Gagal memuatkan rekod daripada LocalStorage:', e);
-            records = [];
+            window.records = [];
         }
 
         const sampleGalleryImages = [];
+
+        function showCustomAlert(title, message, icon = '✅') {
+            document.getElementById('alert-icon').innerText = icon;
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert-modal').classList.add('hidden');
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -884,7 +1259,7 @@
 
             let allPhotos = [...sampleGalleryImages];
 
-            records.forEach(r => {
+            (window.records || []).forEach(r => {
                 [r.img1, r.img2, r.img3].forEach((img) => {
                     if (img && img.trim() !== '') {
                         allPhotos.unshift({
@@ -941,218 +1316,7 @@
             document.getElementById('lightbox-img').src = '';
         }
 
-        function showToolDetail(index) {
-            const tool = toolDetails[index];
-            if (!tool) return;
-
-            const container = document.getElementById('tool-detail-card');
-            if (!container) return;
-
-            document.querySelectorAll('.tool-tab-btn').forEach(btn => btn.classList.remove('border-blue-900', 'bg-blue-50', 'ring-2', 'ring-blue-900/20'));
-            const activeBtn = document.getElementById(`tool-btn-${index}`);
-            if (activeBtn) {
-                activeBtn.classList.add('border-blue-900', 'bg-blue-50', 'ring-2', 'ring-blue-900/20');
-            }
-
-            let dynamicHtml = `
-                <div class="flex flex-col md:flex-row justify-between items-start border-b pb-4 mb-6 gap-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-blue-900">${tool.bm}</h3>
-                        <p class="text-xs font-semibold text-emerald-600 uppercase tracking-widest">${tool.en}</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <div class="lg:col-span-7 space-y-6">
-                        
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center space-x-2">
-                                <span>❓</span> <span>Apa itu ${tool.bm.split('.')[1] ? tool.bm.split('.')[1].trim() : tool.bm}?</span>
-                            </h4>
-                            <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">${tool.whatIs}</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center space-x-2">
-                                <span>🎯</span> <span>Objektif Utama</span>
-                            </h4>
-                            <ul class="list-disc list-inside text-sm text-slate-700 space-y-1 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
-                                ${tool.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                            </ul>
-                        </div>
-            `;
-
-            if (tool.focusTitle) {
-                dynamicHtml += `
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <h4 class="font-bold text-blue-900 text-sm mb-2">${tool.focusTitle}</h4>
-                        ${tool.focusSteps ? `<ul class="list-disc list-inside text-sm text-slate-700 space-y-1.5 mb-2">${tool.focusSteps.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
-                        ${tool.focusText ? `<p class="text-sm text-slate-700 mb-2">${tool.focusText}</p>` : ''}
-                    </div>
-                `;
-            }
-
-            if (tool.phases) {
-                dynamicHtml += `
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                            <span>🔄</span> <span>Fasa Pelaksanaan</span>
-                        </h4>
-                        ${tool.phases.map(p => `
-                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm">
-                                <h5 class="font-bold text-blue-900 mb-1">${p.title}</h5>
-                                <p class="text-slate-700">${p.desc}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            if (tool.stepsList) {
-                dynamicHtml += `
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                            <span>📋</span> <span>Langkah Pelaksanaan</span>
-                        </h4>
-                        ${tool.stepsList.map(st => `
-                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm">
-                                <h5 class="font-bold text-blue-900 mb-1">${st.t}</h5>
-                                <p class="text-slate-700">${st.d}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            if (tool.models) {
-                dynamicHtml += `
-                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                        <h4 class="font-bold text-purple-900 text-sm mb-2">3 Model Peer Coaching:</h4>
-                        <ul class="list-disc list-inside text-sm text-purple-900 space-y-1 font-medium">
-                            ${tool.models.map(m => `<li>${m}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
-
-            if (tool.improveTitle) {
-                dynamicHtml += `
-                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
-                        <h4 class="font-bold text-emerald-900 text-sm mb-2">${tool.improveTitle}</h4>
-                        <p class="text-sm text-slate-700 mb-2">${tool.improveText}</p>
-                    </div>
-                `;
-            }
-
-            if (tool.shareTitle) {
-                dynamicHtml += `
-                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                        <h4 class="font-bold text-amber-900 text-sm mb-2">${tool.shareTitle}</h4>
-                        <p class="text-sm text-slate-700">${tool.shareText}</p>
-                    </div>
-                `;
-            }
-
-            if (tool.exampleTitle) {
-                dynamicHtml += `
-                    <div class="bg-slate-100 p-4 rounded-lg border border-slate-300">
-                        <h4 class="font-bold text-slate-800 text-sm mb-1">${tool.exampleTitle}</h4>
-                        <p class="text-xs text-slate-700 leading-relaxed">${tool.exampleText}</p>
-                    </div>
-                `;
-            }
-
-            if (tool.keyNote) {
-                dynamicHtml += `
-                    <div class="p-3 bg-blue-900 text-white rounded-lg text-xs font-bold text-center tracking-wide shadow-sm whitespace-pre-line">
-                        ${tool.keyNote}
-                    </div>
-                `;
-            }
-
-            dynamicHtml += `
-                    </div>
-
-                    <div class="lg:col-span-5 flex flex-col items-center sticky top-24">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center w-full shadow-sm">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">INFOGRAFIK ALAT KOLABORATIF</h4>
-                            <div class="w-full bg-white rounded-lg border border-slate-200 overflow-hidden p-2 flex items-center justify-center">
-                                <img src="${tool.img}" alt="${tool.bm}" class="w-full h-auto max-h-[500px] object-contain rounded transition transform hover:scale-105 duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x500/1e3a8a/ffffff?text=Infografik+${encodeURIComponent(tool.bm)}';">
-                            </div>
-                            <p class="text-xs text-slate-500 mt-3 italic">Carta Panduan Rasmi PLC KPM SKP7</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-4 border-t flex justify-end">
-                    <button onclick="switchTab('launch')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-sm transition flex items-center space-x-2 shadow">
-                        <span>🏠</span>
-                        <span>Kembali ke Muka Utama</span>
-                    </button>
-                </div>
-            `;
-
-            container.innerHTML = dynamicHtml;
-        }
-
-        function populateAllTeachersDropdown() {
-            const select = document.getElementById('input-disediakan');
-            if (!select) return;
-
-            select.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
-            const allTeachers = [];
-
-            Object.values(teacherData).forEach(list => {
-                list.forEach(t => {
-                    if (!allTeachers.includes(t)) {
-                        allTeachers.push(t);
-                    }
-                });
-            });
-
-            allTeachers.sort().forEach(guru => {
-                const opt = document.createElement('option');
-                opt.value = guru;
-                opt.textContent = guru;
-                select.appendChild(opt);
-            });
-        }
-
-        function updateTeacherDropdown() {
-            const panitiaSelect = document.getElementById('input-panitia');
-            const guruSelect = document.getElementById('input-guru');
-            if (!panitiaSelect || !guruSelect) return;
-
-            const selectedPanitia = panitiaSelect.value;
-            guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
-
-            if (selectedPanitia && teacherData[selectedPanitia]) {
-                teacherData[selectedPanitia].forEach(guru => {
-                    const opt = document.createElement('option');
-                    opt.value = guru;
-                    opt.innerText = guru;
-                    guruSelect.appendChild(opt);
-                });
-            }
-        }
-
-        function previewImage(input, targetId) {
-            const file = input.files[0];
-            const preview = document.getElementById(targetId);
-            const label = document.getElementById(`${targetId}-label`);
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                    if (label) label.classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handleFormSubmit(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
 
             const statusRadio = document.querySelector('input[name="status-hantar"]:checked');
@@ -1177,19 +1341,29 @@
                 img3: document.getElementById('preview-3').src || ''
             };
 
-            records.push(newRecord);
+            // Simpan ke senarai setempat dahulu
+            if (!window.records) window.records = [];
+            window.records.unshift(newRecord);
+
             try {
-                localStorage.setItem('skp7_plc_records', JSON.stringify(records));
+                localStorage.setItem('skp7_plc_records', JSON.stringify(window.records));
             } catch (err) {
                 console.error("Gagal menyimpan ke LocalStorage:", err);
             }
 
-            if (selectedStatus === 'Hantar') {
-                alert('BERJAYA: Rekod OPR telah berjaya DIHANTAR dan DISIMPAN ke dalam Dashboard Rekod!');
-            } else {
-                alert('DIKEMAS KINI: Rekod OPR telah disimpan dengan Status "TIDAK HANTAR" ke dalam Dashboard Rekod.');
+            // Hantar ke Cloud Firestore jika terhubung
+            if (window.saveRecordToCloud) {
+                await window.saveRecordToCloud(newRecord);
             }
 
+            // Notifikasi Kejayaan
+            showCustomAlert(
+                'BERJAYA DISIMPAN!',
+                `Rekod OPR oleh ${newRecord.guru} telah berjaya dimasukkan terus ke dalam Dashboard Rekod OPR.`,
+                '🎉'
+            );
+
+            // Resets form & previews
             document.getElementById('opr-form').reset();
             
             ['preview-1', 'preview-2', 'preview-3'].forEach(id => {
@@ -1202,6 +1376,7 @@
                 if (lbl) lbl.classList.remove('hidden');
             });
 
+            // TERUS BAWA PENGGUNA KE TAB DASHBOARD REKOD
             switchTab('dashboard');
         }
 
@@ -1210,14 +1385,16 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
-            if (records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Tiada rekod disimpan.</td></tr>`;
+            const recList = window.records || [];
+
+            if (recList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 bg-white">Tiada rekod disimpan setakat ini. Sila isi Borang Tugasan OPR untuk memasukkan rekod baru.</td></tr>`;
                 return;
             }
 
-            records.forEach((rec, idx) => {
+            recList.forEach((rec, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50";
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
                 const statusColor = rec.status === 'Hantar' 
                     ? 'text-emerald-700 bg-emerald-100 border-emerald-300' 
@@ -1235,25 +1412,120 @@
                             ${rec.status === 'Hantar' ? '✓ HANTAR' : '✕ TIDAK HANTAR'}
                         </span>
                     </td>
-                    <td class="p-3 text-center space-x-2">
-                        <button onclick="printOPR(${rec.id})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs rounded font-medium shadow-sm transition">
-                            Cetak OPR
-                        </button>
-                        ${isJU ? `<button onclick="deleteRecord(${rec.id})" class="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white text-xs rounded font-medium shadow-sm transition">Padam</button>` : ''}
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center space-x-1.5 flex-wrap gap-1">
+                            <button onclick="viewRecordDetail(${rec.id})" class="px-2.5 py-1 bg-blue-900 hover:bg-blue-800 text-white text-xs rounded font-medium shadow-sm transition flex items-center space-x-1">
+                                <span>🔎 Detail</span>
+                            </button>
+                            <button onclick="printOPR(${rec.id})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs rounded font-medium shadow-sm transition flex items-center space-x-1">
+                                <span>🖨️ Cetak</span>
+                            </button>
+                            ${isJU ? `<button onclick="confirmDeleteRecord('${rec.firestoreId || rec.id}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white text-xs rounded font-medium shadow-sm transition">Padam</button>` : ''}
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function deleteRecord(id) {
-            records = records.filter(r => r.id !== id);
+        function viewRecordDetail(id) {
+            const rec = (window.records || []).find(r => r.id === id || r.firestoreId === id);
+            if (!rec) return;
+
+            document.getElementById('detail-alat').innerText = rec.alat;
+            document.getElementById('detail-guru-sub').innerText = `Guru Dicerap: ${rec.guru}`;
+            document.getElementById('detail-panitia').innerText = rec.panitia;
+            document.getElementById('detail-kelas').innerText = rec.kelas;
+            document.getElementById('detail-tarikh-masa').innerText = `${rec.tarikh} (${rec.masa})`;
+            document.getElementById('detail-data').innerText = rec.data;
+            document.getElementById('detail-disediakan').innerText = rec.disediakan || rec.guru;
+
+            document.getElementById('detail-fokus').innerText = rec.fokus || '-';
+            document.getElementById('detail-improve').innerText = rec.improve || '-';
+            document.getElementById('detail-share').innerText = rec.share || '-';
+
+            const badge = document.getElementById('detail-status-badge');
+            if (rec.status === 'Hantar') {
+                badge.innerText = '✓ HANTAR';
+                badge.className = 'px-3 py-1 text-xs font-bold rounded border bg-emerald-100 text-emerald-800 border-emerald-300';
+            } else {
+                badge.innerText = '✕ TIDAK HANTAR';
+                badge.className = 'px-3 py-1 text-xs font-bold rounded border bg-red-100 text-red-800 border-red-300';
+            }
+
+            const imgContainer = document.getElementById('detail-images-container');
+            imgContainer.innerHTML = '';
+            
+            let hasPhotos = false;
+            [rec.img1, rec.img2, rec.img3].forEach((img, index) => {
+                if (img && img.trim() !== '') {
+                    hasPhotos = true;
+                    const div = document.createElement('div');
+                    div.className = "aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200 cursor-pointer hover:opacity-90 transition";
+                    div.onclick = () => openLightbox(img, `Gambar ${index + 1} - ${rec.guru}`, rec.alat);
+                    div.innerHTML = `<img src="${img}" class="w-full h-full object-cover">`;
+                    imgContainer.appendChild(div);
+                }
+            });
+
+            if (!hasPhotos) {
+                imgContainer.innerHTML = `<p class="text-xs text-slate-400 italic col-span-full">Tiada gambar dilampirkan bagi laporan ini.</p>`;
+            }
+
+            document.getElementById('detail-btn-print').onclick = () => {
+                closeOprDetailModal();
+                printOPR(rec.id);
+            };
+
+            document.getElementById('opr-detail-modal').classList.remove('hidden');
+        }
+
+        function closeOprDetailModal() {
+            document.getElementById('opr-detail-modal').classList.add('hidden');
+        }
+
+        function confirmDeleteRecord(idKey) {
+            if (!isJU) {
+                showCustomAlert(
+                    'AKSES DITOLAK',
+                    'Hanya Admin (Mod JU: Jurulatih Utama) sahaja yang dibenarkan untuk memadam sebarang rekod dalam sistem ini.',
+                    '🔒'
+                );
+                return;
+            }
+
+            recordToDelete = idKey;
+            document.getElementById('btn-confirm-delete').onclick = () => executeDeleteRecord();
+            document.getElementById('delete-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+            recordToDelete = null;
+        }
+
+        async function executeDeleteRecord() {
+            if (!recordToDelete || !isJU) return;
+
+            const rec = (window.records || []).find(r => r.id == recordToDelete || r.firestoreId == recordToDelete);
+
+            if (rec && rec.firestoreId && window.deleteRecordFromCloud) {
+                await window.deleteRecordFromCloud(rec.firestoreId);
+            }
+
+            window.records = (window.records || []).filter(r => r.id != recordToDelete && r.firestoreId != recordToDelete);
+            
             try {
-                localStorage.setItem('skp7_plc_records', JSON.stringify(records));
+                localStorage.setItem('skp7_plc_records', JSON.stringify(window.records));
             } catch (err) {
                 console.error("Gagal mengemaskini LocalStorage:", err);
             }
+
+            closeDeleteModal();
             renderRecordsTable();
+            renderGallery();
+
+            showCustomAlert('REKOD DIPADAM', 'Rekod OPR telah berjaya dipadamkan daripada sistem.', '🗑️');
         }
 
         function openAuthModal() {
@@ -1263,6 +1535,7 @@
                 document.getElementById('role-badge').className = 'px-3 py-1 text-xs font-semibold rounded-full bg-emerald-600 text-white border border-emerald-400 shadow-sm';
                 document.getElementById('btn-toggle-role').innerText = 'Tukar Mod (JU)';
                 renderRecordsTable();
+                showCustomAlert('MOD BERTUKAR', 'Anda kini berada dalam Mod Guru. Fungsi padam telah dikunci.', '👤');
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
             }
@@ -1282,18 +1555,19 @@
                 document.getElementById('btn-toggle-role').innerText = 'Tukar Mod (Guru)';
                 closeAuthModal();
                 renderRecordsTable();
+                showCustomAlert('PENGESAHAN BERJAYA', 'Mod Jurulatih Utama (JU) diaktifkan. Anda kini boleh memadam rekod jika perlu.', '🔑');
             } else {
-                alert('Kata laluan salah! Sila cuba lagi.');
+                showCustomAlert('KATA LALUAN SALAH', 'Kata laluan JU yang dimasukkan adalah salah. Sila cuba lagi.', '❌');
             }
         }
 
         function printOPR(recordId) {
-            const rec = records.find(r => r.id === recordId);
+            const rec = (window.records || []).find(r => r.id === recordId || r.firestoreId === recordId);
             if (!rec) return;
 
             const printWindow = window.open('', '_blank');
             if (!printWindow) {
-                alert('Sila benarkan pop-up window untuk mencetak laporan OPR.');
+                showCustomAlert('SEKATAN POP-UP', 'Sila benarkan pop-up window pada browser anda untuk mencetak laporan OPR.', '⚠️');
                 return;
             }
 
@@ -1402,6 +1676,7 @@
         window.onload = function() {
             showToolDetail(1);
             populateAllTeachersDropdown();
+            renderRecordsTable();
         };
     </script>
 </body>
