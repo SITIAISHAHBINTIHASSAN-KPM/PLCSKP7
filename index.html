@@ -3,239 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLC: MISSION ON! | SK (F) PALONG 7</title>
+    <title>Sistem Pengurusan PLC SK (F) Palong 7</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         navy: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            500: '#334e68',
-                            800: '#102a43',
-                            900: '#0b1b2b',
-                        },
-                        emerald: {
-                            50: '#f0fdf4',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
+                            800: '#0f2942',
+                            900: '#0b1d30',
+                            950: '#071220'
                         },
                         corporate: {
                             blue: '#1b365d',
-                            teal: '#008080',
-                            green: '#00875a',
-                            lightBg: '#f8fafc'
+                            green: '#0d7a5f',
+                            lightgreen: '#10b981',
+                            bg: '#f4f7f9'
                         }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: #f4f7f9;
             color: #1e293b;
         }
-        .bg-corporate-gradient {
-            background: linear-gradient(135deg, #1b365d 0%, #0d47a1 50%, #00875a 100%);
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .active-tab {
-            border-bottom: 3px solid #00875a;
-            color: #1b365d;
-            font-weight: 700;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased">
+<body class="bg-corporate-bg text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <!-- HEADER SISTEM -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- LOGO KIRI -->
+    <!-- HEADER NAV -->
+    <header class="bg-navy-900 text-white shadow-md border-b-4 border-corporate-green sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            <!-- Left: Logo & Title -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('launch')">
-                <img src="https://iili.io/nd21GB1.md.jpg" alt="Logo SK (F) Palong 7" class="h-14 w-auto object-contain rounded border border-slate-100 shadow-sm" onerror="this.src='https://placehold.co/100x100/1b365d/ffffff?text=SKP7'">
+                <img src="https://iili.io/nd21GB1.md.jpg" alt="Logo SK (F) Palong 7" class="h-12 w-auto object-contain rounded bg-white p-1 border border-slate-200" onerror="this.src='https://placehold.co/100x100/1b365d/ffffff?text=SKP7'">
                 <div>
-                    <h1 class="font-extrabold text-navy-900 tracking-tight text-base sm:text-lg uppercase">SK (F) PALONG 7</h1>
-                    <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Professional Learning Community 2026</p>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white uppercase">SK (F) PALONG 7</h1>
+                    <p class="text-xs text-emerald-400 font-medium">Sistem Pengurusan PLC 2026</p>
                 </div>
             </div>
 
-            <!-- MODEPANEL (GURU / JU) & NAVIGATION -->
+            <!-- Role Selector & Quick Actions -->
             <div class="flex items-center space-x-2 sm:space-x-4">
-                <!-- Status Peranan -->
-                <div class="hidden md:flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 text-xs font-medium">
-                    <button id="roleBtnGuru" onclick="setRole('guru')" class="px-3 py-1.5 rounded-md transition-all duration-200 bg-white text-navy-900 shadow-sm font-semibold">GURU</button>
-                    <button id="roleBtnJU" onclick="promptJUPassword()" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-navy-900 transition-all duration-200">JURULATIH UTAMA (JU)</button>
+                <!-- Role Status Badge -->
+                <div id="roleBadge" class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-800 text-slate-300 border border-slate-700 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-slate-400 mr-2" id="roleDot"></span>
+                    <span id="roleText">Mod: GURU</span>
                 </div>
 
-                <!-- Status Badge Mobile -->
-                <span id="roleBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    GURU
-                </span>
-
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 hover:text-navy-900 p-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <!-- JU Login / Logout Button -->
+                <button id="btnRoleSwitch" onclick="openJuLoginModal()" class="px-3 py-1.5 text-xs font-semibold rounded bg-corporate-blue hover:bg-blue-800 border border-blue-400 text-white transition">
+                    Log Masuk JU
                 </button>
             </div>
         </div>
 
-        <!-- MOBILE ROLE SWITCHER -->
-        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 bg-slate-50 px-4 py-3 space-y-2">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tukar Peranan Pengguna:</div>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="setRole('guru'); toggleMobileMenu();" class="py-2 text-center text-xs font-semibold bg-white border border-slate-300 rounded text-navy-900 shadow-sm">GURU</button>
-                <button onclick="promptJUPassword(); toggleMobileMenu();" class="py-2 text-center text-xs font-semibold bg-navy-800 text-white rounded shadow-sm">JURULATIH UTAMA (JU)</button>
+        <!-- MAIN NAVIGATION TABS -->
+        <nav class="bg-navy-950 border-t border-slate-800 px-4 sm:px-8 overflow-x-auto custom-scrollbar">
+            <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-4 text-xs sm:text-sm font-medium py-2">
+                <button onclick="switchTab('launch')" id="nav-launch" class="nav-btn px-3 py-2 rounded text-emerald-400 bg-slate-800 font-bold whitespace-nowrap">UTAMA / LAUNCH</button>
+                <button onclick="switchTab('alat')" id="nav-alat" class="nav-btn px-3 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">ALAT KOLABORATIF</button>
+                <button onclick="switchTab('rujukan')" id="nav-rujukan" class="nav-btn px-3 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">BAHAN RUJUKAN</button>
+                <button onclick="switchTab('opr')" id="nav-opr" class="nav-btn px-3 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">TUGASAN OPR</button>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">DASHBOARD & REKOD</button>
             </div>
-        </div>
+        </nav>
     </header>
 
-    <!-- MAIN NAV BAR (DESKTOP) -->
-    <nav class="bg-navy-900 text-white shadow-md border-b border-navy-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 sm:space-x-6 overflow-x-auto hide-scrollbar text-xs sm:text-sm font-medium py-1">
-            <button onclick="switchTab('launch')" id="nav-launch" class="py-2.5 px-3 whitespace-nowrap hover:text-emerald-400 border-b-2 border-transparent transition-all active-tab">UTAMA (HOME)</button>
-            <button onclick="switchTab('tools')" id="nav-tools" class="py-2.5 px-3 whitespace-nowrap hover:text-emerald-400 border-b-2 border-transparent transition-all">ALAT KOLABORATIF (6 ALAT)</button>
-            <button onclick="switchTab('opr')" id="nav-opr" class="py-2.5 px-3 whitespace-nowrap hover:text-emerald-400 border-b-2 border-transparent transition-all">BORANG TUGASAN OPR</button>
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="py-2.5 px-3 whitespace-nowrap hover:text-emerald-400 border-b-2 border-transparent transition-all">DASHBOARD REKOD OPR</button>
-            <button onclick="switchTab('rujukan')" id="nav-rujukan" class="py-2.5 px-3 whitespace-nowrap hover:text-emerald-400 border-b-2 border-transparent transition-all">BAHAN RUJUKAN</button>
-        </div>
-    </nav>
-
-    <!-- CONTENT WRAPPER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
 
         <!-- SECTION 1: LAUNCH SCREEN -->
-        <section id="section-launch" class="space-y-8">
-            <!-- HERO BANNER -->
-            <div class="bg-corporate-gradient rounded-2xl p-6 sm:p-12 text-white shadow-xl relative overflow-hidden">
+        <section id="sec-launch" class="tab-content block space-y-8">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-navy-900 via-corporate-blue to-navy-800 text-white rounded-xl shadow-lg p-6 sm:p-10 border border-slate-700 relative overflow-hidden">
                 <div class="relative z-10 max-w-3xl space-y-4">
-                    <div class="inline-block px-3 py-1 bg-emerald-500/30 backdrop-blur-md rounded-full text-emerald-200 text-xs font-bold uppercase tracking-widest border border-emerald-400/30">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                         Professional Learning Community 2026
                     </div>
-                    <h2 class="text-3xl sm:text-5xl font-black tracking-tight uppercase leading-tight">
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
                         PLC: MISSION ON!<br>
                         <span class="text-emerald-400">SKP7 ON TRACK!</span>
                     </h2>
-                    <p class="text-lg sm:text-xl font-semibold text-slate-200">
+                    <p class="text-sm sm:text-base text-slate-300 font-medium">
                         6 Alat • 3 Misi • 1 Impak
                     </p>
-                    <blockquote class="text-sm sm:text-base italic text-emerald-100 border-l-4 border-emerald-400 pl-4 py-1">
+                    <blockquote class="text-xs sm:text-sm italic border-l-4 border-emerald-500 pl-4 py-1 text-slate-200">
                         “Daripada Isu Bilik Darjah kepada Impak Pembelajaran.”
                     </blockquote>
-
                     <div class="pt-4 flex flex-wrap gap-4">
-                        <button onclick="switchTab('opr')" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-base rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 border border-emerald-400">
+                        <button onclick="switchTab('opr')" class="px-6 py-3.5 bg-corporate-green hover:bg-emerald-600 text-white font-bold rounded-lg shadow-md transition transform hover:-translate-y-0.5 text-sm sm:text-base tracking-wide uppercase">
                             MULAKAN MISI
                         </button>
-                        <button onclick="switchTab('tools')" class="px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-bold text-base rounded-xl backdrop-blur-md transition-all border border-white/20">
-                            TEROKA 6 ALAT KOLABORATIF
+                        <button onclick="switchTab('alat')" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-semibold rounded-lg shadow-md transition text-sm sm:text-base">
+                            Teroka Alat Kolaboratif
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- JURULATIH UTAMA SECTION -->
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-                <div class="border-b border-slate-200 pb-4 mb-6">
-                    <h3 class="text-xl font-bold text-navy-900 uppercase tracking-wide">Jurulatih Utama PLC SKP7</h3>
-                    <p class="text-xs text-slate-500">Pasukan Pembimbing Utama Program Professional Learning Community Sekolah</p>
-                </div>
-
+            <!-- Quick Info: Jurulatih Utama -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 pb-2 border-b border-slate-100">
+                    Jurulatih Utama PLC SK (F) Palong 7
+                </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- JU 1 -->
-                    <div class="flex items-center space-x-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all">
-                        <img src="https://iili.io/ndGy4Gj.md.png" alt="MOHAMAD NAIM BIN SAHARI" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-emerald-600 shadow" onerror="this.src='https://placehold.co/150x150/1b365d/ffffff?text=JU+NAIM'">
+                    <div class="flex items-center space-x-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                        <img src="https://iili.io/ndGy4Gj.md.png" alt="MOHAMAD NAIM BIN SAHARI" class="w-16 h-16 rounded-full object-cover border-2 border-corporate-blue" onerror="this.src='https://placehold.co/150x150/1b365d/ffffff?text=JU+1'">
                         <div>
-                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">Jurulatih Utama</span>
-                            <h4 class="text-base sm:text-lg font-extrabold text-navy-900">MOHAMAD NAIM BIN SAHARI</h4>
-                            <p class="text-xs text-slate-600">Pegawai Pembimbing & Fasilitator Utama PLC SK (F) Palong 7</p>
+                            <h4 class="font-bold text-slate-800 text-sm sm:text-base">MOHAMAD NAIM BIN SAHARI</h4>
+                            <p class="text-xs text-emerald-700 font-medium">Jurulatih Utama PLC</p>
+                            <p class="text-xs text-slate-500">SK (F) Palong 7</p>
                         </div>
                     </div>
-
                     <!-- JU 2 -->
-                    <div class="flex items-center space-x-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all">
-                        <img src="https://iili.io/ndGi0xV.md.png" alt="Siti Aishah Binti Hassan" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-emerald-600 shadow" onerror="this.src='https://placehold.co/150x150/1b365d/ffffff?text=JU+AISHAH'">
+                    <div class="flex items-center space-x-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                        <img src="https://iili.io/ndGi0xV.md.png" alt="Siti Aishah Binti Hassan" class="w-16 h-16 rounded-full object-cover border-2 border-corporate-green" onerror="this.src='https://placehold.co/150x150/0d7a5f/ffffff?text=JU+2'">
                         <div>
-                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">Jurulatih Utama</span>
-                            <h4 class="text-base sm:text-lg font-extrabold text-navy-900">Siti Aishah Binti Hassan</h4>
-                            <p class="text-xs text-slate-600">Pegawai Pembimbing & Fasilitator Utama PLC SK (F) Palong 7</p>
+                            <h4 class="font-bold text-slate-800 text-sm sm:text-base">Siti Aishah Binti Hassan</h4>
+                            <p class="text-xs text-emerald-700 font-medium">Jurulatih Utama PLC</p>
+                            <p class="text-xs text-slate-500">SK (F) Palong 7</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- QUICK ACCESS ALAT KOLABORATIF -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-navy-900 uppercase">6 Alat Kolaboratif PLC</h3>
-                    <span class="text-xs font-semibold text-emerald-700">Sila Klik Untuk Panduan Lengkap</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="toolsGridHome">
-                    <!-- Dynamic rendering in JS -->
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 2: ALAT KOLABORATIF (6 ALAT) -->
-        <section id="section-tools" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 mb-6 gap-4">
+        <!-- SECTION 2: ALAT KOLABORATIF -->
+        <section id="sec-alat" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-xl font-bold text-navy-900">6 ALAT KOLABORATIF PLC</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Pilih alat kolaboratif di bawah untuk melihat rincian dan maklumat pelaksanaan.</p>
+            </div>
+
+            <!-- Grid 6 Tools -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Tool 1 -->
+                <div onclick="showToolDetail(1)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">KRITIKAN VIDEO</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Video Critique</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Menonton dan menganalisis rakaman pengajaran untuk menambah baik amalan PdP.</p>
+                </div>
+                <!-- Tool 2 -->
+                <div onclick="showToolDetail(2)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">JELAJAH PEMBELAJARAN</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Learning Walk</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Pemerhatian secara berfokus dalam bilik darjah bagi mengenal pasti strategi pembelajaran berkesan.</p>
+                </div>
+                <!-- Tool 3 -->
+                <div onclick="showToolDetail(3)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">BIMBINGAN RAKAN SEKERJA</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Peer Coaching</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Bimbingan secara berpasangan untuk berkongsi kepakaran dan refleksi PdP.</p>
+                </div>
+                <!-- Tool 4 -->
+                <div onclick="showToolDetail(4)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">BELAJAR MENGGUNAKAN RANCANGAN HARIAN</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Lesson Study</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Perancangan, pelaksanaan, dan semakan semula RPH secara kolaboratif bersama rakan panitia.</p>
+                </div>
+                <!-- Tool 5 -->
+                <div onclick="showToolDetail(5)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">SESI PERKONGSIAN GURU</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Teacher Sharing Session</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Platform perkongsian amalan terbaik, bahan pengajaran, serta pengalaman PdP.</p>
+                </div>
+                <!-- Tool 6 -->
+                <div onclick="showToolDetail(6)" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition border-l-4 border-l-corporate-blue hover:border-corporate-green">
+                    <h3 class="text-base font-bold text-navy-900 uppercase">KUMPULAN PENYELESAI MASALAH</h3>
+                    <p class="text-xs text-slate-500 italic mb-2">Problem Solving Group</p>
+                    <p class="text-xs text-slate-600 line-clamp-2">Perbincangan kumpulan khusus untuk merangka penyelesaian isu murid dalam bilik darjah.</p>
+                </div>
+            </div>
+
+            <!-- Detail Modal Container -->
+            <div id="toolDetailView" class="hidden bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-md space-y-4">
+                <div class="flex justify-between items-start border-b border-slate-200 pb-3">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-navy-900 uppercase">6 Alat Kolaboratif PLC</h2>
-                        <p class="text-xs text-slate-500">Pilih alat kolaboratif di bawah untuk melihat panduan pelaksanaan lengkap</p>
+                        <h3 id="toolDetailTitle" class="text-xl font-bold text-navy-900"></h3>
+                        <p id="toolDetailSub" class="text-xs text-slate-500 italic"></p>
                     </div>
-                    <button onclick="switchTab('launch')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-navy-900 font-bold text-xs rounded-lg transition-all border border-slate-300 uppercase">
-                        UTAMA (HOME)
+                    <button onclick="switchTab('launch')" class="px-4 py-1.5 bg-navy-900 text-white rounded text-xs font-semibold hover:bg-slate-700">
+                        UTAMA / HOME
                     </button>
                 </div>
-
-                <!-- TABS CONTAINER -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6" id="toolsNavTabs">
-                    <!-- Nav Tabs dynamically generated -->
-                </div>
-
-                <!-- TOOL DETAIL DISPLAY AREA -->
-                <div id="toolDetailContent" class="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <!-- Content dynamic -->
+                <div id="toolDetailDesc" class="text-sm text-slate-700 leading-relaxed space-y-2"></div>
+                <div class="pt-4 border-t border-slate-100 flex justify-end">
+                    <button onclick="switchTab('launch')" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-xs">
+                        Kembali ke Utama
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 3: BORANG TUGASAN OPR -->
-        <section id="section-opr" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-                <div class="border-b border-slate-200 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <!-- SECTION 3: BAHAN RUJUKAN -->
+        <section id="sec-rujukan" class="tab-content hidden space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-xl font-bold text-navy-900">BAHAN RUJUKAN PLC</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Panduan rasmi dan slaid pembentangan untuk rujukan guru-guru SK (F) Palong 7.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Kit PLC KPM -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-blue-50 text-corporate-blue flex items-center justify-center font-bold text-lg">
+                        KIT
+                    </div>
+                    <h3 class="text-lg font-bold text-navy-900">KIT PLC KPM</h3>
+                    <p class="text-xs sm:text-sm text-slate-600">Dokumen rujukan rasmi Kementerian Pendidikan Malaysia bagi pelaksaan Professional Learning Community di sekolah.</p>
+                    <a href="https://www.moe.gov.my" target="_blank" rel="noopener noreferrer" class="inline-block px-4 py-2 bg-corporate-blue text-white font-medium text-xs rounded hover:bg-navy-900 transition">
+                        Buka Kit PLC KPM
+                    </a>
+                </div>
+
+                <!-- Slide Perbentangan JU -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-50 text-corporate-green flex items-center justify-center font-bold text-lg">
+                        PPT
+                    </div>
+                    <h3 class="text-lg font-bold text-navy-900">SLIDE PERBENTANGAN JU</h3>
+                    <p class="text-xs sm:text-sm text-slate-600">Slaid taklimat dan bengkel pelaksanaan PLC SK (F) Palong 7 yang disediakan oleh Jurulatih Utama.</p>
+                    <button onclick="alert('Bahan Slaid Pembentangan JU sedia untuk dimuat turun melalui pemacu Google Drive Sekolah.')" class="px-4 py-2 bg-corporate-green text-white font-medium text-xs rounded hover:bg-emerald-700 transition">
+                        Papar Slaid JU
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: TUGASAN OPR FORM -->
+        <section id="sec-opr" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-navy-900 uppercase">Borang OPR (One Page Report)</h2>
-                        <p class="text-xs text-slate-500">Isi maklumat tugasan PLC dengan lengkap dan simpan ke rekod rasmi sekolah</p>
+                        <h2 class="text-xl font-bold text-navy-900 uppercase">BORANG TUGASAN OPR (ONE PAGE REPORT)</h2>
+                        <p class="text-xs text-slate-500">Sila isi maklumat pelaksanaan PLC bagi tujuan penyimpanan dan rekod rasmi panitia.</p>
                     </div>
-                    <div class="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold rounded-md">
-                        Penyimpanan: Google Sheets & Drive API
-                    </div>
+                    <span class="px-3 py-1 bg-blue-50 text-corporate-blue text-xs font-bold rounded-full border border-blue-200">
+                        Sistem Penyiapan OPR
+                    </span>
                 </div>
 
                 <form id="oprForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <!-- PANITIA DROPBOX -->
+                        <!-- Dropbox Panitia -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Panitia <span class="text-red-500">*</span></label>
-                            <select id="panitia" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
-                                <option value="">-- PILIH PANITIA --</option>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">PANITIA</label>
+                            <select id="panitia" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
+                                <option value="">-- Pilih Panitia --</option>
                                 <option value="BAHASA MELAYU">BAHASA MELAYU</option>
                                 <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
                                 <option value="MATEMATIK & SAINS">MATEMATIK & SAINS</option>
@@ -245,11 +278,11 @@
                             </select>
                         </div>
 
-                        <!-- ALAT KOLABORASI DROPBOX -->
+                        <!-- Dropbox Alat Kolaborasi -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Alat Kolaborasi <span class="text-red-500">*</span></label>
-                            <select id="alatKolaborasi" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
-                                <option value="">-- PILIH ALAT KOLABORASI --</option>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">ALAT KOLABORASI</label>
+                            <select id="alatKolaborasi" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
+                                <option value="">-- Pilih Alat Kolaborasi --</option>
                                 <option value="KRITIKAN VIDEO (VIDEO CRITIQUE)">KRITIKAN VIDEO (VIDEO CRITIQUE)</option>
                                 <option value="JELAJAH PEMBELAJARAN (LEARNING WALK)">JELAJAH PEMBELAJARAN (LEARNING WALK)</option>
                                 <option value="BIMBINGAN RAKAN SEKERJA (PEER COACHING)">BIMBINGAN RAKAN SEKERJA (PEER COACHING)</option>
@@ -259,17 +292,17 @@
                             </select>
                         </div>
 
-                        <!-- NAMA GURU DICERAP -->
+                        <!-- Nama Guru Dicerap -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Nama Guru Yang Dicerap / Terlibat <span class="text-red-500">*</span></label>
-                            <input type="text" id="namaGuru" required placeholder="Cth: CIKGU AHMAD BIN MUSA" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">NAMA GURU YANG DICERAP / DIBIMBING</label>
+                            <input type="text" id="namaGuru" placeholder="Contoh: MOHAMAD NAIM BIN SAHARI" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
                         </div>
 
-                        <!-- KELAS DROPBOX -->
+                        <!-- Kelas -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Kelas <span class="text-red-500">*</span></label>
-                            <select id="kelas" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
-                                <option value="">-- PILIH KELAS --</option>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">KELAS</label>
+                            <select id="kelas" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
+                                <option value="">-- Pilih Kelas --</option>
                                 <option value="PRASEKOLAH">PRASEKOLAH</option>
                                 <option value="1 ZAABA">1 ZAABA</option>
                                 <option value="2 ZAABA">2 ZAABA</option>
@@ -285,611 +318,313 @@
                             </select>
                         </div>
 
-                        <!-- TARIKH CALENDAR -->
+                        <!-- Tarikh -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Tarikh Pelaksanaan <span class="text-red-500">*</span></label>
-                            <input type="date" id="tarikh" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">TARIKH</label>
+                            <input type="date" id="tarikh" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
                         </div>
 
-                        <!-- MASA (12 JAM) -->
+                        <!-- Masa -->
                         <div>
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Masa Sesi (12-Jam) <span class="text-red-500">*</span></label>
-                            <div class="flex space-x-2">
-                                <input type="time" id="masaTime" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
-                                <select id="masaPeriod" class="w-28 px-2 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm font-semibold">
-                                    <option value="AM">AM</option>
-                                    <option value="PM">PM</option>
-                                </select>
-                            </div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">MASA (Format 12 Jam)</label>
+                            <input type="text" id="masa" placeholder="Contoh: 09:30 AM" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
                         </div>
 
-                        <!-- PENGUMPULAN DATA DROPBOX -->
+                        <!-- Pengumpulan Data -->
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-navy-900 uppercase mb-2">Pilihan Pengumpulan Data <span class="text-red-500">*</span></label>
-                            <select id="pengumpulanData" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
-                                <option value="">-- PILIH PENGUMPULAN DATA --</option>
-                                <option value="PBD">PBD (Pentaksiran Bilik Darjah)</option>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">PENGUMPULAN DATA</label>
+                            <select id="pengumpulanData" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none">
+                                <option value="">-- Pilih Sumber Data --</option>
+                                <option value="PBD">PBD</option>
                                 <option value="MARKAH PRESTASI">MARKAH PRESTASI</option>
                                 <option value="REFLEKSI RPH">REFLEKSI RPH</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- PROSES PELAKSANAAN ALAT KOLABORASI (FOKUS, IMPROVE, SHARE) -->
-                    <div class="space-y-4 pt-4 border-t border-slate-200">
-                        <h3 class="text-sm font-extrabold text-navy-900 uppercase tracking-wide">Proses Pelaksanaan Alat Kolaborasi</h3>
-                        
+                    <!-- PROSES PELAKSANAAN ALAT KOLABORASI -->
+                    <div class="border-t border-slate-200 pt-6 space-y-4">
+                        <h3 class="text-sm font-bold uppercase text-navy-900 tracking-wider">PROSES PELAKSANAAN ALAT KOLABORASI</h3>
+
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">FOKUS : <span class="text-red-500">*</span></label>
-                            <textarea id="fokus" rows="3" required placeholder="Nyatakan fokus utama/isu pembelajaran yang diteliti..." class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"></textarea>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">FOKUS :</label>
+                            <textarea id="fokus" rows="3" required placeholder="Nyatakan fokus utama pemerhatian / perbincangan..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none"></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">IMPROVE : <span class="text-red-500">*</span></label>
-                            <textarea id="improve" rows="3" required placeholder="Nyatakan tindakan penambahbaikan atau intervensi..." class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"></textarea>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">IMPROVE :</label>
+                            <textarea id="improve" rows="3" required placeholder="Cadangan penambahbaikan yang dikenal pasti..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none"></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">SHARE : <span class="text-red-500">*</span></label>
-                            <textarea id="share" rows="3" required placeholder="Nyatakan hasil dapatan atau perkara yang dikongsi bersama ahli..." class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"></textarea>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">SHARE :</label>
+                            <textarea id="share" rows="3" required placeholder="Dapatan atau tindakan susulan yang dikongsi bersama..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-corporate-blue focus:outline-none"></textarea>
                         </div>
                     </div>
 
-                    <!-- GAMBAR PELAKSANAAN (3 IMAGES) -->
-                    <div class="space-y-4 pt-4 border-t border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-extrabold text-navy-900 uppercase tracking-wide">Gambar Pelaksanaan (3 Keping)</h3>
-                            <span class="text-xs text-slate-500">Gambar dikompres automatik bagi kelajuan muat naik</span>
-                        </div>
+                    <!-- GAMBAR PELAKSANAAN -->
+                    <div class="border-t border-slate-200 pt-6 space-y-4">
+                        <h3 class="text-sm font-bold uppercase text-navy-900 tracking-wider">GAMBAR PELAKSANAAN (3 GAMBAR)</h3>
+                        <p class="text-xs text-slate-500">Pilih fail gambar atau muatkan URL imej pelaksanaan.</p>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <!-- Image 1 -->
-                            <div class="border border-dashed border-slate-300 p-3 rounded-xl text-center bg-slate-50">
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Gambar 1</label>
-                                <input type="file" id="img1" accept="image/*" onchange="previewAndCompressImage(this, 'prev1')" class="hidden">
-                                <div onclick="document.getElementById('img1').click()" class="cursor-pointer h-32 bg-white border rounded-lg flex items-center justify-center overflow-hidden">
-                                    <img id="prev1" class="hidden h-full w-full object-cover">
-                                    <span id="prev1-text" class="text-xs text-slate-400 font-medium">+ Pilih Gambar 1</span>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Gambar 1</label>
+                                <input type="file" id="file1" accept="image/*" onchange="convertImageToBase64(this, 'img1')" class="w-full text-xs text-slate-500 border border-slate-300 rounded p-1">
+                                <input type="hidden" id="img1">
                             </div>
-
-                            <!-- Image 2 -->
-                            <div class="border border-dashed border-slate-300 p-3 rounded-xl text-center bg-slate-50">
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Gambar 2</label>
-                                <input type="file" id="img2" accept="image/*" onchange="previewAndCompressImage(this, 'prev2')" class="hidden">
-                                <div onclick="document.getElementById('img2').click()" class="cursor-pointer h-32 bg-white border rounded-lg flex items-center justify-center overflow-hidden">
-                                    <img id="prev2" class="hidden h-full w-full object-cover">
-                                    <span id="prev2-text" class="text-xs text-slate-400 font-medium">+ Pilih Gambar 2</span>
-                                </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Gambar 2</label>
+                                <input type="file" id="file2" accept="image/*" onchange="convertImageToBase64(this, 'img2')" class="w-full text-xs text-slate-500 border border-slate-300 rounded p-1">
+                                <input type="hidden" id="img2">
                             </div>
-
-                            <!-- Image 3 -->
-                            <div class="border border-dashed border-slate-300 p-3 rounded-xl text-center bg-slate-50">
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Gambar 3</label>
-                                <input type="file" id="img3" accept="image/*" onchange="previewAndCompressImage(this, 'prev3')" class="hidden">
-                                <div onclick="document.getElementById('img3').click()" class="cursor-pointer h-32 bg-white border rounded-lg flex items-center justify-center overflow-hidden">
-                                    <img id="prev3" class="hidden h-full w-full object-cover">
-                                    <span id="prev3-text" class="text-xs text-slate-400 font-medium">+ Pilih Gambar 3</span>
-                                </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Gambar 3</label>
+                                <input type="file" id="file3" accept="image/*" onchange="convertImageToBase64(this, 'img3')" class="w-full text-xs text-slate-500 border border-slate-300 rounded p-1">
+                                <input type="hidden" id="img3">
                             </div>
                         </div>
                     </div>
 
-                    <!-- PENGESAHAN & SUBMIT -->
-                    <div class="pt-4 border-t border-slate-200 space-y-4">
-                        <div class="flex items-start space-x-2">
-                            <input type="checkbox" id="confirmTick" required class="mt-1 h-4 w-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
-                            <label for="confirmTick" class="text-xs text-slate-600 font-medium leading-tight">
-                                Saya mengesahkan bahawa maklumat dan gambar yang dimasukkan adalah benar serta telah dilaksanakan mengikut panduan PLC SK (F) Palong 7.
-                            </label>
+                    <!-- Pengesahan Hantar -->
+                    <div class="border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="chkHantar" required class="h-4 w-4 text-corporate-blue rounded border-slate-300 focus:ring-corporate-blue">
+                            <label for="chkHantar" class="text-xs font-semibold text-slate-700">Saya mengesahkan semua maklumat di atas adalah benar dan sah.</label>
                         </div>
 
-                        <!-- STATUS INDICATOR -->
-                        <div id="statusMessage" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
-
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button type="submit" id="btnSubmit" class="flex-1 py-3 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md transition-all uppercase tracking-wider">
-                                SIMPAN REKOD & HANTAR OPR
-                            </button>
-                            <button type="reset" onclick="resetFormPreviews()" class="py-3 px-6 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm rounded-xl transition-all uppercase">
-                                SEMULA
-                            </button>
-                        </div>
+                        <button type="submit" id="btnSubmitForm" class="w-full sm:w-auto px-8 py-3 bg-corporate-green hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg shadow transition">
+                            HANTAR & SIMPAN REKOD
+                        </button>
                     </div>
                 </form>
             </div>
         </section>
 
-        <!-- SECTION 4: DASHBOARD REKOD OPR -->
-        <section id="section-dashboard" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 pb-4 mb-6 gap-4">
+        <!-- SECTION 5: DASHBOARD & REKOD -->
+        <section id="sec-dashboard" class="tab-content hidden space-y-6">
+            <!-- Action & Filter Bar -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-navy-900 uppercase">Dashboard Rekod OPR</h2>
-                        <p class="text-xs text-slate-500">Senarai penuh rekod One Page Report PLC yang telah dihantar oleh guru</p>
+                        <h2 class="text-xl font-bold text-navy-900 uppercase">DASHBOARD REKOD OPR</h2>
+                        <p class="text-xs text-slate-500">Data diambil terus dari Google Sheet (ID: 1-QjrFEPDm7wQIDPzubAoShdlBBWIKnQNvtVqGf4MnAk)</p>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="fetchRecordsFromSheet()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-navy-900 text-xs font-bold rounded-lg border border-slate-300 transition-all uppercase">
-                            MUAT SEMULA DATA
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Direct Refresh Button -->
+                        <button onclick="fetchRecordsFromSheet()" class="px-3.5 py-2 bg-corporate-blue hover:bg-navy-900 text-white rounded text-xs font-semibold transition">
+                            Muat Semula Data Sheet
                         </button>
-                        <button onclick="printDashboardSummary()" class="px-4 py-2 bg-navy-800 hover:bg-navy-900 text-white text-xs font-bold rounded-lg shadow transition-all uppercase">
-                            CETAK DASHBOARD
+
+                        <!-- Print Dashboard / OPR Button -->
+                        <button onclick="printDashboard()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold transition">
+                            Cetak Dashboard / OPR
                         </button>
                     </div>
                 </div>
 
-                <!-- FILTER BAR -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Carian Nama / Fokus:</label>
-                        <input type="text" id="filterSearch" onkeyup="renderDashboardTable()" placeholder="Ketik untuk mencari..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tapis Panitia:</label>
-                        <select id="filterPanitia" onchange="renderDashboardTable()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
-                            <option value="">SEMUA PANITIA</option>
-                            <option value="BAHASA MELAYU">BAHASA MELAYU</option>
-                            <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
-                            <option value="MATEMATIK & SAINS">MATEMATIK & SAINS</option>
-                            <option value="PENDIDIKAN ISLAM & BAHASA ARAB">PENDIDIKAN ISLAM & BAHASA ARAB</option>
-                            <option value="PENDIDIKAN JASMANI & KESIHATAN">PENDIDIKAN JASMANI & KESIHATAN</option>
-                            <option value="PRASEKOLAH & PEMULIHAN KHAS">PRASEKOLAH & PEMULIHAN KHAS</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tapis Alat PLC:</label>
-                        <select id="filterAlat" onchange="renderDashboardTable()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
-                            <option value="">SEMUA ALAT</option>
-                            <option value="KRITIKAN VIDEO">KRITIKAN VIDEO</option>
-                            <option value="JELAJAH PEMBELAJARAN">JELAJAH PEMBELAJARAN</option>
-                            <option value="BIMBINGAN RAKAN SEKERJA">BIMBINGAN RAKAN SEKERJA</option>
-                            <option value="BELAJAR MENGGUNAKAN RANCANGAN HARIAN">LESSON STUDY</option>
-                            <option value="SESI PERKONGSIAN GURU">TEACHER SHARING</option>
-                            <option value="KUMPULAN PENYELESAI MASALAH">PROBLEM SOLVING</option>
-                        </select>
-                    </div>
+                <!-- Google Sheet Connection Status -->
+                <div id="sheetStatusBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                    Sistem dalam proses menyemak sambungan Google Sheet...
                 </div>
+            </div>
 
-                <!-- TABLE REKOD -->
-                <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
+            <!-- Table Container -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
                     <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="bg-navy-900 text-white font-bold uppercase tracking-wider">
+                        <thead class="bg-navy-900 text-white uppercase text-[11px] font-semibold tracking-wider">
                             <tr>
-                                <th class="p-3">#</th>
-                                <th class="p-3">Tarikh / Masa</th>
                                 <th class="p-3">Panitia</th>
                                 <th class="p-3">Alat Kolaborasi</th>
-                                <th class="p-3">Guru Dicerap</th>
+                                <th class="p-3">Nama Guru Dicerap</th>
                                 <th class="p-3">Kelas</th>
+                                <th class="p-3">Tarikh & Masa</th>
                                 <th class="p-3">Data</th>
-                                <th class="p-3 text-center">Tindakan</th>
+                                <th class="p-3 text-center">Tindakan / Cetak</th>
                             </tr>
                         </thead>
-                        <tbody id="dashboardTableBody" class="divide-y divide-slate-200 bg-white">
-                            <!-- Dynamic Content -->
+                        <tbody id="oprTableBody" class="divide-y divide-slate-200">
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400">
+                                    Memuatkan data dari Google Sheet...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 5: BAHAN RUJUKAN -->
-        <section id="section-rujukan" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-                <div class="border-b border-slate-200 pb-4 mb-6">
-                    <h2 class="text-2xl font-extrabold text-navy-900 uppercase">Bahan Rujukan PLC</h2>
-                    <p class="text-xs text-slate-500">Koleksi Kit PLC KPM dan Slide Perbentangan Jurulatih Utama</p>
-                </div>
-
-                <!-- TABS RUJUKAN -->
-                <div class="flex space-x-2 border-b border-slate-200 mb-6">
-                    <button onclick="switchRujukanTab('kit')" id="tabRujukanKit" class="py-2 px-4 text-xs font-extrabold border-b-2 border-emerald-600 text-navy-900">KIT PLC KPM</button>
-                    <button onclick="switchRujukanTab('slide')" id="tabRujukanSlide" class="py-2 px-4 text-xs font-bold text-slate-500 hover:text-navy-900">SLIDE PERBENTANGAN JU</button>
-                </div>
-
-                <!-- CONTENT KIT PLC KPM -->
-                <div id="contentRujukanKit" class="space-y-4">
-                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-3">
-                        <h3 class="text-base font-extrabold text-navy-900">Kit Panduan Pelaksanaan Professional Learning Community (PLC) KPM</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Panduan rasmi Kementerian Pendidikan Malaysia dalam melaksanakan komuniti pembelajaran profesional di sekolah. Kit ini mengandungi garis panduan, Borang Sarana Sekolah, serta pelaksanaan 6 alat kolaboratif secara terperinci.
-                        </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            <div class="p-3 bg-white border border-slate-200 rounded-lg">
-                                <h4 class="text-xs font-bold text-emerald-800 uppercase">Buku Panduan PLC KPM</h4>
-                                <p class="text-xs text-slate-500 mt-1">Garis panduan rasmi pelaksanaan PLC edisi terkini.</p>
-                                <a href="https://www.moe.gov.my" target="_blank" class="inline-block mt-2 text-xs font-bold text-navy-900 underline">Buka Dokumen PDF</a>
-                            </div>
-                            <div class="p-3 bg-white border border-slate-200 rounded-lg">
-                                <h4 class="text-xs font-bold text-emerald-800 uppercase">Borang Alat Kolaboratif</h4>
-                                <p class="text-xs text-slate-500 mt-1">Templat sarana dan borang semakan pencerapan.</p>
-                                <a href="https://www.moe.gov.my" target="_blank" class="inline-block mt-2 text-xs font-bold text-navy-900 underline">Muat Turun Templat</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CONTENT SLIDE PERBENTANGAN JU -->
-                <div id="contentRujukanSlide" class="hidden space-y-4">
-                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-3">
-                        <h3 class="text-base font-extrabold text-navy-900">Slide Perbentangan Jurulatih Utama SKP7</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Bahan taklimat dan bengkel PLC 2026 yang disediakan oleh MOHAMAD NAIM BIN SAHARI dan Siti Aishah Binti Hassan.
-                        </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            <div class="p-3 bg-white border border-slate-200 rounded-lg border-l-4 border-l-navy-800">
-                                <h4 class="text-xs font-bold text-navy-900 uppercase">Modul 1: Orientasi & Misi PLC SKP7 2026</h4>
-                                <p class="text-xs text-slate-500 mt-1">Disediakan oleh Mohamad Naim Bin Sahari</p>
-                            </div>
-                            <div class="p-3 bg-white border border-slate-200 rounded-lg border-l-4 border-l-emerald-600">
-                                <h4 class="text-xs font-bold text-navy-900 uppercase">Modul 2: Pelaksanaan 6 Alat Kolaboratif Berkesan</h4>
-                                <p class="text-xs text-slate-500 mt-1">Disediakan oleh Siti Aishah Binti Hassan</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
     </main>
 
+    <!-- MODAL: JU LOGIN -->
+    <div id="juLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200">
+            <h3 class="text-base font-bold text-navy-900 border-b border-slate-100 pb-2">Kebenaran Jurulatih Utama (JU)</h3>
+            <p class="text-xs text-slate-600">Sila masukkan kata laluan JU untuk akses penuh dan pengurusan data.</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Laluan JU</label>
+                <input type="password" id="juPasswordInput" class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-corporate-blue focus:outline-none">
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeJuModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold">Batal</button>
+                <button onclick="verifyJuPassword()" class="px-4 py-2 bg-corporate-blue hover:bg-navy-900 text-white rounded text-xs font-semibold">Log Masuk</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
-    <footer class="bg-navy-900 text-white border-t border-navy-800 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-            <p class="text-xs font-bold tracking-wider uppercase text-emerald-400">PLC: MISSION ON! • SKP7 ON TRACK!</p>
-            <p class="text-xs text-slate-400">Sekolah Kebangsaan (F) Palong 7, Negeri Sembilan © 2026. Hak Cipta Terpelihara.</p>
+    <footer class="bg-navy-950 text-slate-400 border-t border-slate-800 text-xs py-4 px-4 text-center">
+        <div class="max-w-7xl mx-auto space-y-1">
+            <p class="font-medium text-slate-300">Hak Cipta Terpelihara © 2026 SK (F) Palong 7</p>
+            <p class="text-[11px] text-slate-500">Sistem Pengurusan PLC • Google Sheet ID: 1-QjrFEPDm7wQIDPzubAoShdlBBWIKnQNvtVqGf4MnAk</p>
         </div>
     </footer>
 
     <script>
-        // CONFIGURATION & CONSTANTS
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJvSdaIW0vzDkPG7MV_Dk128P7Rl8fEHWpuc4khuPr943-516XjOsk4-ceMHEQcrQl/exec";
-        const SHEET_ID = "1-QjrFEPDm7wQIDPzubAoShdlBBWIKnQNvtVqGf4MnAk";
-        const DRIVE_FOLDER_ID = "1EXJXKoKAxZyyFayZGTgLO9X3ntdcb78S";
-        const JU_PASSWORD = "juplcskp7";
+        // GLOBAL CONSTANTS & STATE
+        const SHEET_ID = '1-QjrFEPDm7wQIDPzubAoShdlBBWIKnQNvtVqGf4MnAk';
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJvSdaIW0vzDkPG7MV_Dk128P7Rl8fEHWpuc4khuPr943-516XjOsk4-ceMHEQcrQl/exec';
 
-        // GLOBAL STATE
-        let currentUserRole = "guru";
+        let isJU = false;
         let oprRecords = [];
-        let base64Images = { img1: "", img2: "", img3: "" };
 
-        // 6 ALAT KOLABORATIF DATA
-        const COLLABORATIVE_TOOLS = [
-            {
-                id: "video-critique",
-                titleBM: "KRITIKAN VIDEO",
-                titleEN: "VIDEO CRITIQUE",
-                desc: "Menonton dan menganalisis rakaman video pengajaran untuk mengenal pasti kekuatan dan ruang penambahbaikan dalam PdP.",
-                fokusInfo: "Pencerapan rakaman PdP bagi analisis secara komprehensif bersama rakan sejawat.",
-                langkah: ["Rakapkan sesi PdP", "Tonton bersama ahli kumpulan PLC", "Buat refleksi dan kritikan binaan", "Rancang intervensi baharu"]
-            },
-            {
-                id: "learning-walk",
-                titleBM: "JELAJAH PEMBELAJARAN",
-                titleEN: "LEARNING WALK",
-                desc: "Walking through kelas semasa PdP berlangsung untuk mengamati amalan terbaik guru lain dalam persekitaran sebenar.",
-                fokusInfo: "Fokus pemerhatian spesifik seperti kawalan kelas, penglibatan murid, atau bahan bantu belajar.",
-                langkah: ["Tentukan fokus pemerhatian", "Melawat kelas mengikut jadual", "Mencatat amalan positif", "Sesi perbincangan dapatan"]
-            },
-            {
-                id: "peer-coaching",
-                titleBM: "BIMBINGAN RAKAN SEKERJA",
-                titleEN: "PEER COACHING",
-                desc: "Kerjasama dua atau lebih guru untuk membimbing, mencerap, dan memberi maklum balas reflektif secara sistematik.",
-                fokusInfo: "Bimbingan berasaskan model Pra-Pencerapan, Pencerapan, dan Pasca-Pencerapan.",
-                langkah: ["Sesi perbincangan pra-pencerapan", "Pencerapan PdP di dalam kelas", "Sesi maklum balas pasca-pencerapan", "Penetapan tindakan susulan"]
-            },
-            {
-                id: "lesson-study",
-                titleBM: "BELAJAR MENGGUNAKAN RANCANGAN HARIAN",
-                titleEN: "LESSON STUDY",
-                desc: "Proses kolaboratif merancang RPH, mengajar/mencerap, dan menilai semula keberkesanan pengajaran secara terperinci.",
-                fokusInfo: "Pembinaan RPH sasaran bersama bagi menangani isu pembelajaran murid.",
-                langkah: ["Tentukan isu & bina RPH bersama", "Seorang guru mengajar, ahli mencerap", "Sesi refleksi dan semakan RPH", "Penambahbaikan RPH"]
-            },
-            {
-                id: "teacher-sharing",
-                titleBM: "SESI PERKONGSIAN GURU",
-                titleEN: "TEACHER SHARING SESSION",
-                desc: "Platform berkongsi pengalaman, pedagogi inovatif, bahan bantu mengajar, dan amalan terbaik sesama guru.",
-                fokusInfo: "Penyampaian idea, teknik PdP, atau penggunaan teknologi pendidikan baharu.",
-                langkah: ["Sediakan bahan perkongsian", "Sesi pembentangan ringkas", "Sesi soal jawab & perbincangan", "Aplikasi dalam PdP"]
-            },
-            {
-                id: "problem-solving",
-                titleBM: "KUMPULAN PENYELESAI MASALAH",
-                titleEN: "PROBLEM SOLVING GROUP",
-                desc: "Perbincangan berstruktur bagi menganalisis isu khusus murid dan mencari penyelesaian strategik kolektif.",
-                fokusInfo: "Analisis isu disiplin, pemahaman murid, atau pencapaian akademik.",
-                langkah: ["Kenal pasti isu spesifik", "Analisis punca masalah", "Sumbang saran penyelesaian", "Pelaksanaan & pemantauan"]
-            }
-        ];
-
-        // INIT SYSTEM
         window.onload = function() {
-            renderToolsGridHome();
-            renderToolsDetailView(0);
-            loadInitialData();
+            // Check stored role
+            const storedRole = localStorage.getItem('skp7_role');
+            if (storedRole === 'JU') {
+                setRole(true);
+            } else {
+                setRole(false);
+            }
+
+            // Initial fetch from Google Sheet
+            fetchRecordsFromSheet();
         };
 
-        // NAVIGATION LOGIC
-        function switchTab(tabId) {
-            const sections = ['launch', 'tools', 'opr', 'dashboard', 'rujukan'];
-            sections.forEach(s => {
-                document.getElementById(`section-${s}`).classList.add('hidden');
-                const navBtn = document.getElementById(`nav-${s}`);
-                if (navBtn) navBtn.classList.remove('active-tab');
+        // TAB SWITCHING LOGIC
+        function switchTab(tabKey) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-emerald-400', 'bg-slate-800', 'font-bold');
+                el.classList.add('text-slate-300');
             });
 
-            document.getElementById(`section-${tabId}`).classList.remove('hidden');
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            if (activeNav) activeNav.classList.add('active-tab');
+            const targetSec = document.getElementById(`sec-${tabKey}`);
+            const targetNav = document.getElementById(`nav-${tabKey}`);
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
-
-        // ROLE MANAGEMENT
-        function setRole(role) {
-            currentUserRole = role;
-            const badge = document.getElementById('roleBadge');
-            const btnGuru = document.getElementById('roleBtnGuru');
-            const btnJU = document.getElementById('roleBtnJU');
-
-            if (role === 'ju') {
-                badge.innerText = "JURULATIH UTAMA (JU)";
-                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-navy-800 text-white border border-navy-900";
-                btnJU.className = "px-3 py-1.5 rounded-md transition-all duration-200 bg-navy-800 text-white shadow-sm font-semibold";
-                btnGuru.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-navy-900 transition-all duration-200";
-            } else {
-                badge.innerText = "GURU";
-                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
-                btnGuru.className = "px-3 py-1.5 rounded-md transition-all duration-200 bg-white text-navy-900 shadow-sm font-semibold";
-                btnJU.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-navy-900 transition-all duration-200";
+            if (targetSec) targetSec.classList.remove('hidden');
+            if (targetNav) {
+                targetNav.classList.add('text-emerald-400', 'bg-slate-800', 'font-bold');
+                targetNav.classList.remove('text-slate-300');
             }
+
+            // Hide tool details when switching away
+            const toolDetailView = document.getElementById('toolDetailView');
+            if (toolDetailView) toolDetailView.classList.add('hidden');
+        }
+
+        // ROLE MANAGEMENT & JU AUTH
+        function openJuLoginModal() {
+            if (isJU) {
+                // Logout JU
+                setRole(false);
+                alert('Anda telah log keluar daripada Mod JU.');
+            } else {
+                document.getElementById('juPasswordInput').value = '';
+                document.getElementById('juLoginModal').classList.remove('hidden');
+            }
+        }
+
+        function closeJuModal() {
+            document.getElementById('juLoginModal').classList.add('hidden');
+        }
+
+        function verifyJuPassword() {
+            const pwd = document.getElementById('juPasswordInput').value;
+            if (pwd === 'juplcskp7') {
+                setRole(true);
+                closeJuModal();
+                alert('Akses JU Berjaya disahkan!');
+            } else {
+                alert('Kata laluan salah. Sila cuba lagi.');
+            }
+        }
+
+        function setRole(statusJU) {
+            isJU = statusJU;
+            const badge = document.getElementById('roleBadge');
+            const dot = document.getElementById('roleDot');
+            const text = document.getElementById('roleText');
+            const btn = document.getElementById('btnRoleSwitch');
+
+            if (isJU) {
+                localStorage.setItem('skp7_role', 'JU');
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-400 mr-2';
+                text.innerText = 'Mod: JURULATIH UTAMA (JU)';
+                btn.innerText = 'Log Keluar JU';
+                badge.className = 'px-3 py-1 text-xs font-semibold rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 flex items-center';
+            } else {
+                localStorage.setItem('skp7_role', 'GURU');
+                dot.className = 'w-2 h-2 rounded-full bg-slate-400 mr-2';
+                text.innerText = 'Mod: GURU';
+                btn.innerText = 'Log Masuk JU';
+                badge.className = 'px-3 py-1 text-xs font-semibold rounded-full bg-slate-800 text-slate-300 border border-slate-700 flex items-center';
+            }
+
             renderDashboardTable();
         }
 
-        function promptJUPassword() {
-            const pwd = prompt("Sila masukkan Kata Laluan Jurulatih Utama (JU):");
-            if (pwd === JU_PASSWORD) {
-                setRole('ju');
-                alert("Akses Jurulatih Utama (JU) Berjaya Diberikan.");
-            } else if (pwd !== null) {
-                alert("Kata Laluan Salah. Akses Ditolak.");
+        // DIRECT GOOGLE SHEET FETCH FUNCTION
+        async function fetchRecordsFromSheet() {
+            const statusBadge = document.getElementById('sheetStatusBadge');
+            if (statusBadge) {
+                statusBadge.innerHTML = `<span class="w-2 h-2 mr-1.5 bg-amber-500 rounded-full animate-ping"></span> Menghubungi Google Sheet...`;
+                statusBadge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200";
             }
-        }
 
-        // RENDER 6 ALAT HOMEPAGE & DETAIL
-        function renderToolsGridHome() {
-            const container = document.getElementById('toolsGridHome');
-            container.innerHTML = COLLABORATIVE_TOOLS.map((t, index) => `
-                <div onclick="openToolDetail(${index})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group hover:border-emerald-500">
-                    <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">ALAT ${index + 1}</span>
-                    <h4 class="text-base font-extrabold text-navy-900 mt-2 group-hover:text-emerald-700 uppercase">${t.titleBM}</h4>
-                    <p class="text-xs text-slate-400 font-semibold mb-2">${t.titleEN}</p>
-                    <p class="text-xs text-slate-600 line-clamp-2">${t.desc}</p>
-                </div>
-            `).join('');
-        }
-
-        function openToolDetail(index) {
-            switchTab('tools');
-            renderToolsDetailView(index);
-        }
-
-        function renderToolsDetailView(activeIndex) {
-            const navContainer = document.getElementById('toolsNavTabs');
-            navContainer.innerHTML = COLLABORATIVE_TOOLS.map((t, idx) => `
-                <button onclick="renderToolsDetailView(${idx})" class="p-2.5 text-left rounded-lg text-xs font-bold transition-all border ${idx === activeIndex ? 'bg-navy-900 text-white border-navy-900 shadow' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}">
-                    <div>${t.titleBM}</div>
-                    <div class="text-[9px] opacity-75 font-normal">${t.titleEN}</div>
-                </button>
-            `).join('');
-
-            const t = COLLABORATIVE_TOOLS[activeIndex];
-            const detailArea = document.getElementById('toolDetailContent');
-            detailArea.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-start border-b border-slate-200 pb-3">
-                        <div>
-                            <span class="text-xs font-extrabold text-emerald-700 uppercase">Panduan Rasmi Alat Kolaboratif</span>
-                            <h3 class="text-xl font-black text-navy-900 uppercase">${t.titleBM}</h3>
-                            <p class="text-xs font-bold text-slate-500 uppercase">${t.titleEN}</p>
-                        </div>
-                        <button onclick="switchTab('launch')" class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-navy-900 hover:bg-slate-100 uppercase">
-                            UTAMA (HOME)
-                        </button>
-                    </div>
-
-                    <p class="text-sm text-slate-700 font-medium leading-relaxed">${t.desc}</p>
-
-                    <div class="p-4 bg-white rounded-lg border border-slate-200">
-                        <h4 class="text-xs font-bold text-navy-900 uppercase mb-1">Fokus Pelaksanaan:</h4>
-                        <p class="text-xs text-slate-600">${t.fokusInfo}</p>
-                    </div>
-
-                    <div>
-                        <h4 class="text-xs font-bold text-navy-900 uppercase mb-2">Langkah Pelaksanaan Utama:</h4>
-                        <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1">
-                            ${t.langkah.map(l => `<li>${l}</li>`).join('')}
-                        </ol>
-                    </div>
-                </div>
-            `;
-        }
-
-        // BAHAN RUJUKAN TABS
-        function switchRujukanTab(type) {
-            document.getElementById('contentRujukanKit').classList.add('hidden');
-            document.getElementById('contentRujukanSlide').classList.add('hidden');
-            document.getElementById('tabRujukanKit').className = "py-2 px-4 text-xs font-bold text-slate-500 hover:text-navy-900";
-            document.getElementById('tabRujukanSlide').className = "py-2 px-4 text-xs font-bold text-slate-500 hover:text-navy-900";
-
-            if (type === 'kit') {
-                document.getElementById('contentRujukanKit').classList.remove('hidden');
-                document.getElementById('tabRujukanKit').className = "py-2 px-4 text-xs font-extrabold border-b-2 border-emerald-600 text-navy-900";
-            } else {
-                document.getElementById('contentRujukanSlide').classList.remove('hidden');
-                document.getElementById('tabRujukanSlide').className = "py-2 px-4 text-xs font-extrabold border-b-2 border-emerald-600 text-navy-900";
-            }
-        }
-
-        // IMAGE PREVIEW & COMPRESSION LOGIC (REDUCES BASE64 SIZE AUTOMATICALLY)
-        function previewAndCompressImage(input, previewId) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDimension = 800; // Resize to max 800px for optimal speed and size
-
-                    if (width > maxDimension || height > maxDimension) {
-                        if (width > height) {
-                            height = Math.round((height * maxDimension) / width);
-                            width = maxDimension;
-                        } else {
-                            width = Math.round((width * maxDimension) / height);
-                            height = maxDimension;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Compress JPEG quality to 60%
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-
-                    const imgEl = document.getElementById(previewId);
-                    imgEl.src = compressedBase64;
-                    imgEl.classList.remove('hidden');
-                    document.getElementById(`${previewId}-text`).classList.add('hidden');
-
-                    if (previewId === 'prev1') base64Images.img1 = compressedBase64;
-                    if (previewId === 'prev2') base64Images.img2 = compressedBase64;
-                    if (previewId === 'prev3') base64Images.img3 = compressedBase64;
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function resetFormPreviews() {
-            ['prev1', 'prev2', 'prev3'].forEach(id => {
-                const img = document.getElementById(id);
-                if(img) {
-                    img.src = '';
-                    img.classList.add('hidden');
-                }
-                const txt = document.getElementById(`${id}-text`);
-                if(txt) txt.classList.remove('hidden');
-            });
-            base64Images = { img1: "", img2: "", img3: "" };
-        }
-
-        // FORM SUBMISSION & SAFE STORAGE LOGIC
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            const statusDiv = document.getElementById('statusMessage');
-            const btnSubmit = document.getElementById('btnSubmit');
-
-            statusDiv.className = "p-3 rounded-lg text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 block";
-            statusDiv.innerText = "Sedang Memproses & Menyimpan Rekod OPR...";
-            btnSubmit.disabled = true;
-
-            const recordData = {
-                id: 'OPR-' + Date.now(),
-                timestamp: new Date().toLocaleString('ms-MY'),
-                panitia: document.getElementById('panitia').value,
-                alatKolaborasi: document.getElementById('alatKolaborasi').value,
-                namaGuru: document.getElementById('namaGuru').value,
-                kelas: document.getElementById('kelas').value,
-                tarikh: document.getElementById('tarikh').value,
-                masa: `${document.getElementById('masaTime').value} ${document.getElementById('masaPeriod').value}`,
-                pengumpulanData: document.getElementById('pengumpulanData').value,
-                fokus: document.getElementById('fokus').value,
-                improve: document.getElementById('improve').value,
-                share: document.getElementById('share').value,
-                img1: base64Images.img1,
-                img2: base64Images.img2,
-                img3: base64Images.img3
-            };
+            // Strategy 1: Fetch directly via CSV export endpoint from Google Sheets
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
             try {
-                // Safe LocalStorage Saving with Quota Fallback
-                try {
-                    oprRecords.unshift(recordData);
-                    localStorage.setItem('skp7_opr_records', JSON.stringify(oprRecords));
-                } catch (storageErr) {
-                    console.warn('LocalStorage Quota full, storing record metadata without large image buffer locally:', storageErr);
-                    const cleanRecords = JSON.parse(JSON.stringify(oprRecords));
-                    if(cleanRecords.length > 0) {
-                        cleanRecords[0].img1 = "";
-                        cleanRecords[0].img2 = "";
-                        cleanRecords[0].img3 = "";
+                const response = await fetch(csvUrl);
+                if (response.ok) {
+                    const csvText = await response.text();
+                    const parsed = parseCSVData(csvText);
+                    if (parsed && parsed.length > 0) {
+                        oprRecords = parsed;
+                        updateStatusSuccess(statusBadge, oprRecords.length);
+                        renderDashboardTable();
+                        return;
                     }
-                    try { localStorage.setItem('skp7_opr_records', JSON.stringify(cleanRecords)); } catch(e) {}
                 }
-
-                // Send data to Google Apps Script API endpoint
-                if (APPS_SCRIPT_URL) {
-                    fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sheetId: SHEET_ID,
-                            driveFolderId: DRIVE_FOLDER_ID,
-                            action: 'CREATE',
-                            data: recordData
-                        })
-                    }).catch(e => console.log('API Background dispatch executed'));
-                }
-
-                statusDiv.className = "p-3 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block";
-                statusDiv.innerText = "Berjaya! Rekod OPR telah disimpan dengan selamat.";
-
-                document.getElementById('oprForm').reset();
-                resetFormPreviews();
-                renderDashboardTable();
-
-                setTimeout(() => {
-                    statusDiv.classList.add('hidden');
-                    switchTab('dashboard');
-                }, 1500);
-
             } catch (err) {
-                console.error("Submission Error:", err);
-                statusDiv.className = "p-3 rounded-lg text-xs font-semibold bg-red-50 text-red-800 border border-red-200 block";
-                statusDiv.innerText = "Ralat semasa menyimpan: " + (err.message || "Sila pastikan maklumat diisi dengan betul.");
-            } finally {
-                btnSubmit.disabled = false;
+                console.warn("CSV Fetch fallback triggered:", err);
             }
-        }
 
-        // LOAD DATA & DASHBOARD TABLE
-        function loadInitialData() {
-            const saved = localStorage.getItem('skp7_opr_records');
-            if (saved) {
-                try { oprRecords = JSON.parse(saved); } catch(e) { oprRecords = []; }
-            } else {
-                // Sample Data
+            // Strategy 2: Fallback to Apps Script GET
+            try {
+                const appScriptRes = await fetch(APP_SCRIPT_URL);
+                if (appScriptRes.ok) {
+                    const data = await appScriptRes.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        oprRecords = data;
+                        updateStatusSuccess(statusBadge, oprRecords.length);
+                        renderDashboardTable();
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn("Apps Script fetch failed:", err);
+            }
+
+            // Fallback if sheet is completely empty or restricted
+            if (!oprRecords || oprRecords.length === 0) {
                 oprRecords = [
                     {
                         id: 'OPR-1001',
-                        timestamp: '09/09/2026, 10:00 AM',
                         panitia: 'BAHASA MELAYU',
                         alatKolaborasi: 'JELAJAH PEMBELAJARAN (LEARNING WALK)',
                         namaGuru: 'MOHAMAD NAIM BIN SAHARI',
@@ -904,189 +639,361 @@
                     }
                 ];
             }
+
+            if (statusBadge) {
+                statusBadge.innerHTML = `<span class="w-2 h-2 mr-1.5 bg-blue-500 rounded-full"></span> Mod Tempatan / Sheet Terhubung (${oprRecords.length} Rekod)`;
+                statusBadge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200";
+            }
             renderDashboardTable();
         }
 
-        function fetchRecordsFromSheet() {
-            alert("Memuat semula data dari Google Sheet API...");
-            loadInitialData();
+        function updateStatusSuccess(badge, count) {
+            if (badge) {
+                badge.innerHTML = `<span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full"></span> Data Google Sheet Berjaya Digenerasikan (${count} Rekod)`;
+                badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200";
+            }
         }
 
+        // CSV PARSER
+        function parseCSVData(csv) {
+            const lines = csv.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            if (lines.length < 2) return [];
+
+            const records = [];
+            for (let i = 1; i < lines.length; i++) {
+                // Split by comma considering quotes
+                const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
+                const cleanRow = row.map(val => val.replace(/^"|"$/g, '').trim());
+
+                // Column alignment:
+                // Panitia, Alat Kolaborasi, Nama Guru Dicerap, Kelas, Tarikh, Masa, Pengumpulan Data, Fokus, Improve, Share, Gambar 1 URL, Gambar 2 URL, Gambar 3 URL
+                if (cleanRow.length >= 5) {
+                    records.push({
+                        id: 'OPR-' + (1000 + i),
+                        panitia: cleanRow[0] || 'UMUM',
+                        alatKolaborasi: cleanRow[1] || '-',
+                        namaGuru: cleanRow[2] || '-',
+                        kelas: cleanRow[3] || '-',
+                        tarikh: cleanRow[4] || '-',
+                        masa: cleanRow[5] || '-',
+                        pengumpulanData: cleanRow[6] || '-',
+                        fokus: cleanRow[7] || '-',
+                        improve: cleanRow[8] || '-',
+                        share: cleanRow[9] || '-',
+                        img1: cleanRow[10] || '',
+                        img2: cleanRow[11] || '',
+                        img3: cleanRow[12] || ''
+                    });
+                }
+            }
+            return records;
+        }
+
+        // RENDER DASHBOARD TABLE
         function renderDashboardTable() {
-            const tbody = document.getElementById('dashboardTableBody');
-            const searchVal = document.getElementById('filterSearch').value.toLowerCase();
-            const panitiaVal = document.getElementById('filterPanitia').value;
-            const alatVal = document.getElementById('filterAlat').value;
+            const tbody = document.getElementById('oprTableBody');
+            if (!tbody) return;
 
-            const filtered = oprRecords.filter(r => {
-                const matchSearch = r.namaGuru.toLowerCase().includes(searchVal) || r.fokus.toLowerCase().includes(searchVal);
-                const matchPanitia = !panitiaVal || r.panitia === panitiaVal;
-                const matchAlat = !alatVal || r.alatKolaborasi.includes(alatVal);
-                return matchSearch && matchPanitia && matchAlat;
-            });
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="p-6 text-center text-slate-400 font-medium">Tiada rekod OPR dijumpai.</td>
-                    </tr>
-                `;
+            if (oprRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Tiada rekod ditemui dalam Google Sheet.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map((r, i) => `
-                <tr class="hover:bg-slate-50 border-b border-slate-100">
-                    <td class="p-3 font-bold">${i + 1}</td>
-                    <td class="p-3">
-                        <div class="font-bold text-navy-900">${r.tarikh}</div>
-                        <div class="text-[10px] text-slate-500">${r.masa}</div>
-                    </td>
-                    <td class="p-3 font-semibold text-emerald-800">${r.panitia}</td>
-                    <td class="p-3 font-medium text-slate-700">${r.alatKolaborasi}</td>
-                    <td class="p-3 font-bold text-navy-900">${r.namaGuru}</td>
-                    <td class="p-3 font-semibold text-slate-600">${r.kelas}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 border text-slate-700 rounded text-[10px] font-bold">${r.pengumpulanData}</span></td>
-                    <td class="p-3 text-center">
-                        <div class="flex items-center justify-center space-x-1">
-                            <button onclick="printSingleOPR('${r.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-[10px] uppercase shadow-sm">
-                                CETAK OPR
+            let html = '';
+            oprRecords.forEach((item, idx) => {
+                html += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-3 font-semibold text-corporate-blue">${escapeHtml(item.panitia)}</td>
+                        <td class="p-3 font-medium text-slate-800">${escapeHtml(item.alatKolaborasi)}</td>
+                        <td class="p-3">${escapeHtml(item.namaGuru)}</td>
+                        <td class="p-3 font-semibold">${escapeHtml(item.kelas)}</td>
+                        <td class="p-3 text-slate-500 whitespace-nowrap">${escapeHtml(item.tarikh)}<br><span class="text-[10px] text-slate-400">${escapeHtml(item.masa)}</span></td>
+                        <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-bold">${escapeHtml(item.pengumpulanData)}</span></td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="printSingleOPR(${idx})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-medium transition">
+                                Cetak OPR
                             </button>
-                            ${currentUserRole === 'ju' ? `
-                                <button onclick="deleteRecord('${r.id}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-[10px] uppercase shadow-sm">
-                                    PADAM
-                                </button>
-                            ` : ''}
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+                            ${isJU ? `<button onclick="deleteRecord('${item.id}', ${idx})" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[11px] font-medium transition">Padam</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // TOOL DETAILS MAP
+        function showToolDetail(id) {
+            const detailView = document.getElementById('toolDetailView');
+            const titleEl = document.getElementById('toolDetailTitle');
+            const subEl = document.getElementById('toolDetailSub');
+            const descEl = document.getElementById('toolDetailDesc');
+
+            const toolData = {
+                1: {
+                    title: "KRITIKAN VIDEO",
+                    sub: "Video Critique",
+                    desc: "Menonton rakaman video pengajaran PdP untuk membuat analisis terperinci mengenai teknik penyampaian, penglibatan murid, dan kecekapan pengurusan bilik darjah secara konstruktif."
+                },
+                2: {
+                    title: "JELAJAH PEMBELAJARAN",
+                    sub: "Learning Walk",
+                    desc: "Berjalan di sekitar koridor dan kelas untuk membuat pemerhatian ringkas berfokus terhadap suasana pengajaran dan amalan terbaik guru lain tanpa mengganggu perjalan PdP."
+                },
+                3: {
+                    title: "BIMBINGAN RAKAN SEKERJA",
+                    sub: "Peer Coaching",
+                    desc: "Kerjasama dua hala antara guru pembimbing (coach) dan guru yang dibimbing (coachee) untuk merencana, meramal, dan menambah baik strategi PdP secara profesional."
+                },
+                4: {
+                    title: "BELAJAR MENGGUNAKAN RANCANGAN HARIAN",
+                    sub: "Lesson Study",
+                    desc: "Proses kolaboratif bagi merancang RPH, mengajar dan mengamati pengajaran berkenaan, serta membuat penilaian semula untuk penambahbaikan mutu PdP."
+                },
+                5: {
+                    title: "SESI PERKONGSIAN GURU",
+                    sub: "Teacher Sharing Session",
+                    desc: "Sesi perjumpaan berkala untuk guru-guru berkongsi amalan terbaik, bahan bantuan mengajar, analisis data PBD, atau strategi PdP terkini."
+                },
+                6: {
+                    title: "KUMPULAN PENYELESAI MASALAH",
+                    sub: "Problem Solving Group",
+                    desc: "Perbincangan berstruktur dalam kumpulan kecil bagi mengenal pasti punca utama isu pembelajaran murid serta merangka pelan tindakan yang munasabah."
+                }
+            };
+
+            const data = toolData[id];
+            if (data) {
+                titleEl.innerText = data.title;
+                subEl.innerText = data.sub;
+                descEl.innerHTML = `<p>${data.desc}</p><p class="text-xs text-emerald-700 font-semibold mt-2">Gunakan Borang Tugasan OPR untuk merekodkan sebarang aktiviti alat kolaborasi ini.</p>`;
+                detailView.classList.remove('hidden');
+                detailView.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // IMAGE BASE64 CONVERTER
+        function convertImageToBase64(input, targetId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(targetId).value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // FORM SUBMISSION LOGIC
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnSubmitForm');
+            btn.disabled = true;
+            btn.innerText = 'MENYIMPAN REKOD...';
+
+            const newRecord = {
+                id: 'OPR-' + Date.now(),
+                timestamp: new Date().toLocaleString('ms-MY'),
+                panitia: document.getElementById('panitia').value,
+                alatKolaborasi: document.getElementById('alatKolaborasi').value,
+                namaGuru: document.getElementById('namaGuru').value,
+                kelas: document.getElementById('kelas').value,
+                tarikh: document.getElementById('tarikh').value,
+                masa: document.getElementById('masa').value,
+                pengumpulanData: document.getElementById('pengumpulanData').value,
+                fokus: document.getElementById('fokus').value,
+                improve: document.getElementById('improve').value,
+                share: document.getElementById('share').value,
+                img1: document.getElementById('img1').value,
+                img2: document.getElementById('img2').value,
+                img3: document.getElementById('img3').value
+            };
+
+            // Local save first
+            oprRecords.unshift(newRecord);
+            renderDashboardTable();
+
+            // Try post to Apps Script API
+            try {
+                await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "CREATE", data: newRecord })
+                });
+            } catch (err) {
+                console.warn("Apps Script POST notice:", err);
+            }
+
+            alert('Rekod OPR Berjaya Disimpan ke dalam Sistem!');
+            document.getElementById('oprForm').reset();
+            btn.disabled = false;
+            btn.innerText = 'HANTAR & SIMPAN REKOD';
+
+            switchTab('dashboard');
         }
 
         // DELETE RECORD (JU ONLY)
-        function deleteRecord(id) {
-            if (currentUserRole !== 'ju') {
-                alert("Hanya Jurulatih Utama (JU) dibenarkan memadam data.");
+        async function deleteRecord(id, idx) {
+            if (!isJU) {
+                alert('Akses Ditolak: Hanya Jurulatih Utama (JU) boleh memadam rekod.');
                 return;
             }
-            if (confirm("Adakah anda pasti untuk memadam rekod OPR ini? Tindakan ini tidak boleh dibatalkan.")) {
-                oprRecords = oprRecords.filter(r => r.id !== id);
-                localStorage.setItem('skp7_opr_records', JSON.stringify(oprRecords));
+
+            if (confirm('Adakah anda pasti untuk memadam rekod OPR ini?')) {
+                oprRecords.splice(idx, 1);
                 renderDashboardTable();
+
+                try {
+                    await fetch(APP_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "DELETE", data: { id: id } })
+                    });
+                } catch (err) {
+                    console.warn("Delete request notice:", err);
+                }
             }
         }
 
-        // PRINT SINGLE OPR (A4 FORMAT)
-        function printSingleOPR(id) {
-            const r = oprRecords.find(item => item.id === id);
-            if (!r) return;
+        // PRINT SINGLE OPR FUNCTION
+        function printSingleOPR(idx) {
+            const item = oprRecords[idx];
+            if (!item) return;
 
             const printWindow = window.open('', '_blank');
-            const imgHtml1 = r.img1 ? `<img src="${r.img1}" style="width:100%; height:130px; object-fit:cover; border:1px solid #cbd5e1; border-radius:4px;">` : `<div style="height:130px; border:1px dashed #cbd5e1; display:flex; align-items:center; justify-center; text-align:center; font-size:10px; color:#94a3b8;">Tiada Gambar</div>`;
-            const imgHtml2 = r.img2 ? `<img src="${r.img2}" style="width:100%; height:130px; object-fit:cover; border:1px solid #cbd5e1; border-radius:4px;">` : `<div style="height:130px; border:1px dashed #cbd5e1; display:flex; align-items:center; justify-center; text-align:center; font-size:10px; color:#94a3b8;">Tiada Gambar</div>`;
-            const imgHtml3 = r.img3 ? `<img src="${r.img3}" style="width:100%; height:130px; object-fit:cover; border:1px solid #cbd5e1; border-radius:4px;">` : `<div style="height:130px; border:1px dashed #cbd5e1; display:flex; align-items:center; justify-center; text-align:center; font-size:10px; color:#94a3b8;">Tiada Gambar</div>`;
-
             printWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>OPR REPORT - ${r.namaGuru}</title>
+                    <title>Cetakan OPR PLC - ${item.panitia}</title>
                     <style>
-                        @page { size: A4 portrait; margin: 10mm; }
-                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #1e293b; width: 210mm; min-height: 297mm; }
-                        .print-content { padding: 15px; box-sizing: border-box; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border-bottom: 2px solid #1b365d; pb-2; }
-                        .title-main { font-size: 16px; font-weight: bold; color: #1b365d; text-transform: uppercase; margin: 0; }
-                        .title-sub { font-size: 12px; color: #00875a; font-weight: bold; margin-top: 2px; }
-                        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                        .info-table th, .info-table td { border: 1px solid #cbd5e1; padding: 6px 8px; font-size: 11px; text-align: left; }
-                        .info-table th { background-color: #f1f5f9; color: #0f172a; font-weight: bold; width: 25%; }
-                        .section-title { font-size: 12px; font-weight: bold; color: #1b365d; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; }
-                        .process-box { border: 1px solid #cbd5e1; padding: 8px; font-size: 11px; line-height: 1.4; background-color: #fafafa; margin-bottom: 8px; min-height: 45px; }
-                        .img-grid { display: flex; gap: 10px; margin-top: 10px; }
-                        .img-col { flex: 1; text-align: center; font-size: 10px; font-weight: bold; color: #475569; }
-                        .footer { margin-top: 20px; text-align: right; font-size: 9px; color: #64748b; border-top: 1px solid #e2e8f0; pt: 5px; }
+                        @page { size: A4; margin: 15mm; }
+                        body { font-family: Arial, sans-serif; font-size: 11pt; color: #1e293b; line-height: 1.4; margin: 0; padding: 0; }
+                        .header { text-align: center; border-bottom: 3px double #1b365d; padding-bottom: 10px; margin-bottom: 15px; }
+                        .header h2 { margin: 0; color: #1b365d; font-size: 16pt; text-transform: uppercase; }
+                        .header h3 { margin: 4px 0 0 0; color: #0d7a5f; font-size: 12pt; font-weight: normal; }
+                        .table-grid { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                        .table-grid th, .table-grid td { border: 1px solid #94a3b8; padding: 8px; text-align: left; font-size: 10pt; }
+                        .table-grid th { background-color: #f1f5f9; color: #1b365d; width: 30%; font-weight: bold; }
+                        .section-title { background-color: #1b365d; color: white; padding: 6px 10px; font-weight: bold; font-size: 10pt; margin-top: 15px; margin-bottom: 8px; text-transform: uppercase; }
+                        .box-content { border: 1px solid #cbd5e1; padding: 8px; background-color: #fafafa; font-size: 10pt; min-height: 40px; white-space: pre-wrap; }
+                        .img-grid { display: flex; gap: 10px; margin-top: 10px; justify-content: space-between; }
+                        .img-box { width: 32%; border: 1px solid #cbd5e1; padding: 4px; text-align: center; height: 120px; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; }
+                        .img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                        .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; pt: 10px; text-align: right; font-size: 8pt; color: #64748b; }
                     </style>
                 </head>
                 <body>
                     <div class="print-content">
-                        <!-- HEADER -->
-                        <table class="header-table">
-                            <tr>
-                                <td style="width: 70px;">
-                                    <img src="https://iili.io/nd21GB1.md.jpg" style="height: 60px; width: auto;">
-                                </td>
-                                <td style="padding-left: 10px;">
-                                    <div class="title-main">SEKOLAH KEBANGSAAN (F) PALONG 7</div>
-                                    <div class="title-sub">ONE PAGE REPORT (OPR) - PROFESSIONAL LEARNING COMMUNITY 2026</div>
-                                    <div style="font-size: 10px; color: #475569; margin-top: 2px;">PLC: MISSION ON! • SKP7 ON TRACK!</div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- INFO METADATA -->
-                        <table class="info-table">
-                            <tr>
-                                <th>ALAT KOLABORASI</th>
-                                <td><strong>${r.alatKolaborasi}</strong></td>
-                                <th>PANITIA</th>
-                                <td><strong>${r.panitia}</strong></td>
-                            </tr>
-                            <tr>
-                                <th>NAMA GURU DICERAP</th>
-                                <td>${r.namaGuru}</td>
-                                <th>KELAS</th>
-                                <td>${r.kelas}</td>
-                            </tr>
-                            <tr>
-                                <th>TARIKH PELAKSANAAN</th>
-                                <td>${r.tarikh}</td>
-                                <th>MASA</th>
-                                <td>${r.masa}</td>
-                            </tr>
-                            <tr>
-                                <th>PENGUMPULAN DATA</th>
-                                <td colspan="3"><strong>${r.pengumpulanData}</strong></td>
-                            </tr>
-                        </table>
-
-                        <!-- PROSES PELAKSANAAN ALAT KOLABORASI -->
-                        <div class="section-title">PROSES PELAKSANAAN ALAT KOLABORASI</div>
-                        
-                        <div style="font-size: 11px; font-weight: bold; color: #00875a; margin-top: 5px;">FOKUS:</div>
-                        <div class="process-box">${r.fokus}</div>
-
-                        <div style="font-size: 11px; font-weight: bold; color: #00875a; margin-top: 5px;">IMPROVE:</div>
-                        <div class="process-box">${r.improve}</div>
-
-                        <div style="font-size: 11px; font-weight: bold; color: #00875a; margin-top: 5px;">SHARE:</div>
-                        <div class="process-box">${r.share}</div>
-
-                        <!-- GAMBAR PELAKSANAAN -->
-                        <div class="section-title">GAMBAR PELAKSANAAN</div>
-                        <div class="img-grid">
-                            <div class="img-col">GAMBAR 1${imgHtml1}</div>
-                            <div class="img-col">GAMBAR 2${imgHtml2}</div>
-                            <div class="img-col">GAMBAR 3${imgHtml3}</div>
+                        <div class="header">
+                            <h2>SEKOLAH KEBANGSAAN (F) PALONG 7</h2>
+                            <h3>LAPORAN ONE PAGE REPORT (OPR) PROGRAM PLC 2026</h3>
                         </div>
 
-                        <!-- FOOTER -->
+                        <table class="table-grid">
+                            <tr><th>ALAT KOLABORASI</th><td>${escapeHtml(item.alatKolaborasi)}</td></tr>
+                            <tr><th>PANITIA</th><td>${escapeHtml(item.panitia)}</td></tr>
+                            <tr><th>NAMA GURU DICERAP</th><td>${escapeHtml(item.namaGuru)}</td></tr>
+                            <tr><th>KELAS</th><td>${escapeHtml(item.kelas)}</td></tr>
+                            <tr><th>TARIKH & MASA</th><td>${escapeHtml(item.tarikh)} (${escapeHtml(item.masa)})</td></tr>
+                            <tr><th>PENGUMPULAN DATA</th><td>${escapeHtml(item.pengumpulanData)}</td></tr>
+                        </table>
+
+                        <div class="section-title">PROSES PELAKSANAAN ALAT KOLABORASI</div>
+
+                        <strong>FOKUS:</strong>
+                        <div class="box-content">${escapeHtml(item.fokus)}</div>
+
+                        <strong style="margin-top:8px; display:block;">IMPROVE:</strong>
+                        <div class="box-content">${escapeHtml(item.improve)}</div>
+
+                        <strong style="margin-top:8px; display:block;">SHARE:</strong>
+                        <div class="box-content">${escapeHtml(item.share)}</div>
+
+                        <div class="section-title">GAMBAR PELAKSANAAN</div>
+                        <div class="img-grid">
+                            <div class="img-box">${item.img1 ? `<img src="${item.img1}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 1</span>'}</div>
+                            <div class="img-box">${item.img2 ? `<img src="${item.img2}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 2</span>'}</div>
+                            <div class="img-box">${item.img3 ? `<img src="${item.img3}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 3</span>'}</div>
+                        </div>
+
                         <div class="footer">
-                            Dicetak pada: ${new Date().toLocaleString('ms-MY')} | Sistem Pengurusan PLC SK (F) Palong 7
+                            Dicetak melalui Sistem Pengurusan PLC SK (F) Palong 7 pada ${new Date().toLocaleDateString('ms-MY')}
                         </div>
                     </div>
                 </body>
                 </html>
             `);
-
             printWindow.document.close();
-            setTimeout(() => {
-                printWindow.print();
-            }, 500);
+            setTimeout(() => { printWindow.print(); }, 500);
         }
 
-        // PRINT DASHBOARD SUMMARY
-        function printDashboardSummary() {
-            window.print();
+        // PRINT ENTIRE DASHBOARD SUMMARY
+        function printDashboard() {
+            const printWindow = window.open('', '_blank');
+            let rowsHtml = '';
+            oprRecords.forEach((item, i) => {
+                rowsHtml += `
+                    <tr>
+                        <td>${i+1}</td>
+                        <td>${escapeHtml(item.panitia)}</td>
+                        <td>${escapeHtml(item.alatKolaborasi)}</td>
+                        <td>${escapeHtml(item.namaGuru)}</td>
+                        <td>${escapeHtml(item.kelas)}</td>
+                        <td>${escapeHtml(item.tarikh)}</td>
+                        <td>${escapeHtml(item.pengumpulanData)}</td>
+                    </tr>
+                `;
+            });
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Ringkasan Dashboard OPR PLC - SK (F) Palong 7</title>
+                    <style>
+                        @page { size: A4 landscape; margin: 10mm; }
+                        body { font-family: Arial, sans-serif; font-size: 10pt; color: #1e293b; }
+                        h2 { text-align: center; color: #1b365d; margin-bottom: 5px; }
+                        p { text-align: center; font-size: 9pt; color: #0d7a5f; margin-top: 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th, td { border: 1px solid #cbd5e1; padding: 6px; text-align: left; font-size: 9pt; }
+                        th { background-color: #1b365d; color: white; }
+                        tr:nth-child(even) { background-color: #f8fafc; }
+                    </style>
+                </head>
+                <body>
+                    <h2>SEKOLAH KEBANGSAAN (F) PALONG 7</h2>
+                    <p>RINGKASAN REKOD ONE PAGE REPORT (OPR) PLC 2026</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Panitia</th>
+                                <th>Alat Kolaborasi</th>
+                                <th>Guru Dicerap</th>
+                                <th>Kelas</th>
+                                <th>Tarikh</th>
+                                <th>Pengumpulan Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 500);
         }
     </script>
 </body>
