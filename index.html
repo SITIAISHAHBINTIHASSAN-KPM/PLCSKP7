@@ -58,6 +58,19 @@
         .nav-btn:hover {
             transform: translateY(-1px);
         }
+
+        /* A4 PREVIEW STYLING FOR ON-SCREEN VIEWING */
+        .a4-preview-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            color: #1e293b;
+            font-family: Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between relative">
@@ -422,9 +435,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-navy-900 uppercase flex items-center gap-2">
-                            <span>📊</span> DASHBOARD REKOD OPR (CRUD LENGKAP)
+                            <span>📊</span> DASHBOARD REKOD OPR (FORMAT A4 KEMAS)
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">Pengurusan rekod laporan OPR: Buka, Kemaskini (Edit), Cetak, dan Padam data dalam Google Sheet.</p>
+                        <p class="text-xs text-slate-500 mt-1">Pengurusan rekod laporan OPR: Papar format A4 Portrait, Kemaskini (Edit), Cetak, dan Padam data.</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -454,7 +467,7 @@
                                 <th class="p-3">Alat Kolaborasi</th>
                                 <th class="p-3">Guru Dicerap</th>
                                 <th class="p-3">Tarikh</th>
-                                <th class="p-3 text-center">Tindakan CRUD / Cetak</th>
+                                <th class="p-3 text-center">Tindakan OPR (Format A4)</th>
                             </tr>
                         </thead>
                         <tbody id="oprTableBody" class="divide-y divide-slate-200">
@@ -504,13 +517,23 @@
 
                 <!-- JU EXCLUSIVE PHOTO UPLOAD PANEL -->
                 <div id="juUploadPanel" class="hidden p-5 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border border-blue-200 space-y-4">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="text-sm font-bold text-navy-900 uppercase flex items-center gap-2">
-                            <span>📤</span> MUAT NAIK FOTO BAHARU (KHAS MOD JU SAHAJA)
+                            <span>📤</span> MUAT NAIK FOTO BAHARU (AUTOMATIK KE GOOGLE DRIVE)
                         </h3>
-                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded">
-                            JU ACCESS GRANTED
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <a href="https://drive.google.com/drive/folders/1EXJXKoKAxZyyFayZGTgLO9X3ntdcb78S" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-full border border-blue-300 flex items-center gap-1 transition">
+                                <span>📁</span> Buka Folder Drive
+                            </a>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded">
+                                JU ACCESS GRANTED
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
+                        <span>ℹ️</span>
+                        <span>Foto yang dimuat naik akan dihantar dan disimpan secara automatik ke Google Drive ID: <strong class="font-mono text-emerald-900">1EXJXKoKAxZyyFayZGTgLO9X3ntdcb78S</strong></span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -545,7 +568,32 @@
 
     </main>
 
-    <!-- MODAL 1: JU LOGIN -->
+    <!-- MODAL 1: PREVIEW LAPORAN OPR A4 PORTRAIT -->
+    <div id="viewOprModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full p-4 sm:p-6 space-y-4 border border-slate-700 max-h-[95vh] overflow-y-auto custom-scrollbar my-4">
+            <div class="flex justify-between items-center text-white border-b border-slate-700 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📄</span>
+                    <h3 class="text-base font-extrabold uppercase text-emerald-400">PAPARAN LAPORAN OPR (SAIZ A4 PORTRAIT)</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btnModalPrint" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition flex items-center gap-1.5">
+                        <span>🖨️</span> Cetak A4
+                    </button>
+                    <button onclick="closeViewOprModal()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
+                </div>
+            </div>
+
+            <!-- CONTAINER A4 DISPLAY -->
+            <div class="overflow-x-auto bg-slate-900 p-2 sm:p-4 rounded-xl flex justify-center">
+                <div id="a4ReportContainer" class="a4-preview-page">
+                    <!-- Dynamic A4 Content populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: JU LOGIN -->
     <div id="juLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200">
             <h3 class="text-base font-bold text-navy-900 border-b border-slate-100 pb-2 flex items-center gap-2">
@@ -563,7 +611,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: EDIT / KEMASKINI OPR RECORD (UPDATE CRUD) -->
+    <!-- MODAL 3: EDIT / KEMASKINI OPR RECORD (UPDATE CRUD) -->
     <div id="editOprModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 space-y-4 border border-slate-200 max-h-[90vh] overflow-y-auto custom-scrollbar my-8">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
@@ -668,7 +716,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: CUSTOM CONFIRMATION MODAL -->
+    <!-- MODAL 4: CUSTOM CONFIRMATION MODAL -->
     <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200">
             <h3 class="text-base font-bold text-red-600 flex items-center gap-2">
@@ -699,8 +747,11 @@
 
     <script>
         // GLOBAL CONSTANTS & STATE
+        const LOGO_URL = 'https://iili.io/nd21GB1.md.jpg';
         const SHEET_ID = '1-QjrFEPDm7wQIDPzubAoShdlBBWIKnQNvtVqGf4MnAk';
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJvSdaIW0vzDkPG7MV_Dk128P7Rl8fEHWpuc4khuPr943-516XjOsk4-ceMHEQcrQl/exec';
+        const GOOGLE_DRIVE_FOLDER_ID = '1EXJXKoKAxZyyFayZGTgLO9X3ntdcb78S';
+        const GOOGLE_DRIVE_FOLDER_URL = `https://drive.google.com/drive/folders/${GOOGLE_DRIVE_FOLDER_ID}`;
 
         // AHLI PANITIA MAPPING (RASMI SKP7)
         const GURU_LIST = {
@@ -978,11 +1029,12 @@
                         tarikh: '2026-09-08',
                         masa: '09:00',
                         pengumpulanData: 'PBD',
-                        fokus: 'Pemerhatian penggunaan teknik Pembacaan Karangan.',
-                        improve: 'Penggunaan kad imbasan perkataan bagi murid lemah.',
-                        share: 'Dapatan dikongsi dalam mesyuarat panitia BM.',
+                        fokus: 'Pemerhatian penglibatan murid dan teknik Pembacaan Karangan.',
+                        improve: 'Penggunaan kad imbasan perkataan dan grafik visual bagi murid lemah.',
+                        share: 'Dapatan dan strategi intervensi dikongsi dalam mesyuarat Panitia BM.',
                         img1: 'https://placehold.co/400x300/1b365d/ffffff?text=Aktiviti+PLC+1', 
-                        img2: '', img3: ''
+                        img2: 'https://placehold.co/400x300/0d7a5f/ffffff?text=Aktiviti+PLC+2', 
+                        img3: ''
                     }
                 ];
             }
@@ -1052,8 +1104,11 @@
                         <td class="p-3 text-xs text-slate-800 font-medium">${escapeHtml(item.namaGuru)}</td>
                         <td class="p-3 text-xs text-slate-600">${escapeHtml(item.tarikh)}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="previewOprReport(${idx})" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold transition shadow hover:scale-105">
+                                👁️ Papar OPR
+                            </button>
                             <button onclick="printSingleOPR(${idx})" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold transition shadow hover:scale-105">
-                                🖨️ Cetak OPR
+                                🖨️ Cetak
                             </button>
                             <button onclick="openEditModal(${idx})" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition shadow hover:scale-105">
                                 ✏️ Edit
@@ -1065,6 +1120,178 @@
             });
 
             tbody.innerHTML = html;
+        }
+
+        // GENERATE BEAUTIFUL NEAT A4 PORTRAIT HTML CONTENT FOR PREVIEW & PRINTING
+        function generateA4OprHtml(item) {
+            const logo = LOGO_URL;
+            return `
+                <div style="width: 100%; box-sizing: border-box; color: #0f172a; font-family: Arial, Helvetica, sans-serif;">
+                    
+                    <!-- HEADER SECTION WITH LOGO TOP LEFT -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px double #1b365d; padding-bottom: 12px; margin-bottom: 14px;">
+                        <div style="width: 80px; flex-shrink: 0; text-align: left;">
+                            <img src="${logo}" alt="Logo SKP7" style="max-height: 80px; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/100x100/1b365d/ffffff?text=SKP7'">
+                        </div>
+                        <div style="flex-grow: 1; text-align: center; padding: 0 10px;">
+                            <h2 style="margin: 0; font-size: 15pt; font-weight: 800; color: #1b365d; letter-spacing: 0.5px; text-transform: uppercase;">SEKOLAH KEBANGSAAN (FELDA) PALONG 7</h2>
+                            <p style="margin: 2px 0 0 0; font-size: 9pt; font-weight: 600; color: #475569; text-transform: uppercase;">73470 GEMAS, NEGERI SEMBILAN DARUL KHUSYUS</p>
+                            <div style="margin-top: 6px; display: inline-block; padding: 3px 12px; background-color: #1b365d; color: #ffffff; border-radius: 4px; font-size: 10pt; font-weight: bold; letter-spacing: 0.5px;">
+                                LAPORAN ONE PAGE REPORT (OPR) PLC
+                            </div>
+                        </div>
+                        <div style="width: 80px; flex-shrink: 0; text-align: right; font-size: 8pt; color: #64748b; font-weight: bold;">
+                            SKP7/PLC/2026
+                        </div>
+                    </div>
+
+                    <!-- METADATA GRID TABLE -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 9.5pt;">
+                        <tr>
+                            <th style="width: 25%; background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">PANITIA</th>
+                            <td style="width: 75%; border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold; color: #0f2942;" colspan="3">${escapeHtml(item.panitia)}</td>
+                        </tr>
+                        <tr>
+                            <th style="background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">ALAT KOLABORASI</th>
+                            <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold; color: #0d7a5f;" colspan="3">${escapeHtml(item.alatKolaborasi)}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%; background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">GURU DICERAP</th>
+                            <td style="width: 35%; border: 1px solid #cbd5e1; padding: 6px 8px;">${escapeHtml(item.namaGuru)}</td>
+                            <th style="width: 15%; background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">KELAS</th>
+                            <td style="width: 25%; border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${escapeHtml(item.kelas)}</td>
+                        </tr>
+                        <tr>
+                            <th style="background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">TARIKH & MASA</th>
+                            <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${escapeHtml(item.tarikh)} (${escapeHtml(item.masa)})</td>
+                            <th style="background-color: #f1f5f9; color: #1b365d; border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-weight: bold;">SUMBER DATA</th>
+                            <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold; color: #1b365d;">${escapeHtml(item.pengumpulanData)}</td>
+                        </tr>
+                    </table>
+
+                    <!-- SECTION TITLE: PROSES PELAKSANAAN -->
+                    <div style="background-color: #1b365d; color: #ffffff; padding: 5px 10px; font-size: 9.5pt; font-weight: bold; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        📌 PROSES PELAKSANAAN ALAT KOLABORASI PLC
+                    </div>
+
+                    <!-- FOKUS, IMPROVE, SHARE BOXES -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                        <div style="border: 1px solid #cbd5e1; border-left: 4px solid #1b365d; background-color: #f8fafc; padding: 8px 10px; border-radius: 4px;">
+                            <div style="font-size: 9pt; font-weight: bold; color: #1b365d; margin-bottom: 4px; text-transform: uppercase;">
+                                🎯 FOKUS (PEMERHATIAN / PERBINCANGAN):
+                            </div>
+                            <div style="font-size: 9pt; color: #334155; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(item.fokus || '-')}</div>
+                        </div>
+
+                        <div style="border: 1px solid #cbd5e1; border-left: 4px solid #0d7a5f; background-color: #f8fafc; padding: 8px 10px; border-radius: 4px;">
+                            <div style="font-size: 9pt; font-weight: bold; color: #0d7a5f; margin-bottom: 4px; text-transform: uppercase;">
+                                💡 IMPROVE (PENAMBAHBAIKAN / INTERVENSI):
+                            </div>
+                            <div style="font-size: 9pt; color: #334155; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(item.improve || '-')}</div>
+                        </div>
+
+                        <div style="border: 1px solid #cbd5e1; border-left: 4px solid #0284c7; background-color: #f8fafc; padding: 8px 10px; border-radius: 4px;">
+                            <div style="font-size: 9pt; font-weight: bold; color: #0284c7; margin-bottom: 4px; text-transform: uppercase;">
+                                📢 SHARE (PERKONGSIAN & TINDAKAN SUSULAN):
+                            </div>
+                            <div style="font-size: 9pt; color: #334155; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(item.share || '-')}</div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION TITLE: GAMBAR PELAKSANAAN -->
+                    <div style="background-color: #1b365d; color: #ffffff; padding: 5px 10px; font-size: 9.5pt; font-weight: bold; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        🖼️ GAMBAR PELAKSANAAN ACTIVITI PLC
+                    </div>
+
+                    <!-- 3 IMAGE GRID -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
+                        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #fafafa; text-align: center; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                            ${item.img1 ? `<img src="${item.img1}" style="max-width: 100%; max-height: 105px; object-fit: contain; border-radius: 4px;">` : '<span style="font-size: 8pt; color: #94a3b8; italic;">[ Tiada Gambar 1 ]</span>'}
+                            <span style="font-size: 7.5pt; font-weight: bold; color: #64748b; margin-top: 4px;">Gambar 1</span>
+                        </div>
+                        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #fafafa; text-align: center; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                            ${item.img2 ? `<img src="${item.img2}" style="max-width: 100%; max-height: 105px; object-fit: contain; border-radius: 4px;">` : '<span style="font-size: 8pt; color: #94a3b8; italic;">[ Tiada Gambar 2 ]</span>'}
+                            <span style="font-size: 7.5pt; font-weight: bold; color: #64748b; margin-top: 4px;">Gambar 2</span>
+                        </div>
+                        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #fafafa; text-align: center; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                            ${item.img3 ? `<img src="${item.img3}" style="max-width: 100%; max-height: 105px; object-fit: contain; border-radius: 4px;">` : '<span style="font-size: 8pt; color: #94a3b8; italic;">[ Tiada Gambar 3 ]</span>'}
+                            <span style="font-size: 7.5pt; font-weight: bold; color: #64748b; margin-top: 4px;">Gambar 3</span>
+                        </div>
+                    </div>
+
+                    <!-- SIGNATURE & VERIFICATION SECTION -->
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 10px; border-top: 1px solid #cbd5e1; font-size: 8.5pt;">
+                        <div style="width: 45%;">
+                            <p style="margin: 0; font-weight: bold; color: #1b365d;">Disediakan Oleh:</p>
+                            <br><br>
+                            <p style="margin: 0; border-bottom: 1px dotted #64748b; width: 80%;"></p>
+                            <p style="margin: 4px 0 0 0; font-weight: bold;">(${escapeHtml(item.namaGuru)})</p>
+                            <p style="margin: 0; color: #64748b; font-size: 8pt;">Guru Dicerap / Bimbing</p>
+                        </div>
+                        <div style="width: 45%; text-align: right;">
+                            <p style="margin: 0; font-weight: bold; color: #1b365d;">Disahkan Oleh:</p>
+                            <br><br>
+                            <p style="margin: 0; border-bottom: 1px dotted #64748b; width: 80%; float: right;"></p>
+                            <div style="clear: both;"></div>
+                            <p style="margin: 4px 0 0 0; font-weight: bold;">( KETUA PANITIA / JU PLC )</p>
+                            <p style="margin: 0; color: #64748b; font-size: 8pt;">SK (FELDA) Palong 7</p>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER REMARK -->
+                    <div style="margin-top: 20px; text-align: center; font-size: 7.5pt; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 6px;">
+                        Dokumen Rasmi Sistem PLC SK (F) Palong 7 • Generasi Automatik • Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')}
+                    </div>
+
+                </div>
+            `;
+        }
+
+        // PREVIEW REPORT IN MODAL
+        function previewOprReport(idx) {
+            const item = oprRecords[idx];
+            if (!item) return;
+
+            const container = document.getElementById('a4ReportContainer');
+            container.innerHTML = generateA4OprHtml(item);
+
+            document.getElementById('btnModalPrint').onclick = function() {
+                printSingleOPR(idx);
+            };
+
+            document.getElementById('viewOprModal').classList.remove('hidden');
+        }
+
+        function closeViewOprModal() {
+            document.getElementById('viewOprModal').classList.add('hidden');
+        }
+
+        // PRINT SINGLE OPR FUNCTION
+        function printSingleOPR(idx) {
+            const item = oprRecords[idx];
+            if (!item) return;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Cetakan OPR PLC - ${item.panitia}</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 12mm; }
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; }
+                        @media print {
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${generateA4OprHtml(item)}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 500);
         }
 
         // CRUD: CREATE (FORM SUBMIT)
@@ -1293,12 +1520,14 @@
 
             const btn = document.getElementById('btnJuUploadPhoto');
             btn.disabled = true;
-            btn.innerText = 'MEMUAT NAIK...';
+            btn.innerText = 'MEMUAT NAIK KE DRIVE...';
 
             const newPhoto = {
                 url: base64,
                 title: title,
-                sub: 'Muat Naik JU - Google Drive'
+                sub: 'Simpanan Automatik Google Drive',
+                folderId: GOOGLE_DRIVE_FOLDER_ID,
+                folderUrl: GOOGLE_DRIVE_FOLDER_URL
             };
 
             galleryPhotos.unshift(newPhoto);
@@ -1308,13 +1537,18 @@
                 await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "CREATE_GALLERY", data: newPhoto })
+                    body: JSON.stringify({ 
+                        action: "CREATE_GALLERY", 
+                        data: newPhoto,
+                        folderId: GOOGLE_DRIVE_FOLDER_ID
+                    })
                 });
+                showToast('Foto Berjaya Dimuat Naik & Disimpan ke Google Drive!', 'success');
             } catch (err) {
                 console.warn("Drive Upload notice:", err);
+                showToast('Foto dipaparkan dalam galeri! (Semak kebenaran Apps Script bagi storan Drive)', 'info');
             }
 
-            showToast('Foto Berjaya Dimuat Naik ke Galeri!', 'success');
             document.getElementById('juGalleryTitle').value = '';
             document.getElementById('juGalleryFile').value = '';
             document.getElementById('juGalleryBase64').value = '';
@@ -1549,79 +1783,6 @@
             }
         }
 
-        // PRINT SINGLE OPR FUNCTION
-        function printSingleOPR(idx) {
-            const item = oprRecords[idx];
-            if (!item) return;
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Cetakan OPR PLC - ${item.panitia}</title>
-                    <style>
-                        @page { size: A4; margin: 15mm; }
-                        body { font-family: Arial, sans-serif; font-size: 11pt; color: #1e293b; line-height: 1.4; margin: 0; padding: 0; }
-                        .header { text-align: center; border-bottom: 3px double #1b365d; padding-bottom: 10px; margin-bottom: 15px; }
-                        .header h2 { margin: 0; color: #1b365d; font-size: 16pt; text-transform: uppercase; }
-                        .header h3 { margin: 4px 0 0 0; color: #0d7a5f; font-size: 12pt; font-weight: normal; }
-                        .table-grid { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                        .table-grid th, .table-grid td { border: 1px solid #94a3b8; padding: 8px; text-align: left; font-size: 10pt; }
-                        .table-grid th { background-color: #f1f5f9; color: #1b365d; width: 30%; font-weight: bold; }
-                        .section-title { background-color: #1b365d; color: white; padding: 6px 10px; font-weight: bold; font-size: 10pt; margin-top: 15px; margin-bottom: 8px; text-transform: uppercase; }
-                        .box-content { border: 1px solid #cbd5e1; padding: 8px; background-color: #fafafa; font-size: 10pt; min-height: 40px; white-space: pre-wrap; }
-                        .img-grid { display: flex; gap: 10px; margin-top: 10px; justify-content: space-between; }
-                        .img-box { width: 32%; border: 1px solid #cbd5e1; padding: 4px; text-align: center; height: 120px; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; }
-                        .img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
-                        .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; pt: 10px; text-align: right; font-size: 8pt; color: #64748b; }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-content">
-                        <div class="header">
-                            <h2>SEKOLAH KEBANGSAAN (F) PALONG 7</h2>
-                            <h3>LAPORAN ONE PAGE REPORT (OPR) PROGRAM PLC 2026</h3>
-                        </div>
-
-                        <table class="table-grid">
-                            <tr><th>ALAT KOLABORASI</th><td>${escapeHtml(item.alatKolaborasi)}</td></tr>
-                            <tr><th>PANITIA</th><td>${escapeHtml(item.panitia)}</td></tr>
-                            <tr><th>NAMA GURU DICERAP</th><td>${escapeHtml(item.namaGuru)}</td></tr>
-                            <tr><th>KELAS</th><td>${escapeHtml(item.kelas)}</td></tr>
-                            <tr><th>TARIKH & MASA</th><td>${escapeHtml(item.tarikh)} (${escapeHtml(item.masa)})</td></tr>
-                            <tr><th>PENGUMPULAN DATA</th><td>${escapeHtml(item.pengumpulanData)}</td></tr>
-                        </table>
-
-                        <div class="section-title">PROSES PELAKSANAAN ALAT KOLABORASI</div>
-
-                        <strong>FOKUS:</strong>
-                        <div class="box-content">${escapeHtml(item.fokus)}</div>
-
-                        <strong style="margin-top:8px; display:block;">IMPROVE:</strong>
-                        <div class="box-content">${escapeHtml(item.improve)}</div>
-
-                        <strong style="margin-top:8px; display:block;">SHARE:</strong>
-                        <div class="box-content">${escapeHtml(item.share)}</div>
-
-                        <div class="section-title">GAMBAR PELAKSANAAN</div>
-                        <div class="img-grid">
-                            <div class="img-box">${item.img1 ? `<img src="${item.img1}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 1</span>'}</div>
-                            <div class="img-box">${item.img2 ? `<img src="${item.img2}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 2</span>'}</div>
-                            <div class="img-box">${item.img3 ? `<img src="${item.img3}">` : '<span style="font-size:8pt;color:#94a3b8">Tiada Gambar 3</span>'}</div>
-                        </div>
-
-                        <div class="footer">
-                            Dicetak melalui Sistem Pengurusan PLC SK (F) Palong 7 pada ${new Date().toLocaleDateString('ms-MY')}
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 500);
-        }
-
         // PRINT ENTIRE DASHBOARD SUMMARY
         function printDashboard() {
             const printWindow = window.open('', '_blank');
@@ -1648,8 +1809,11 @@
                     <style>
                         @page { size: A4 landscape; margin: 10mm; }
                         body { font-family: Arial, sans-serif; font-size: 10pt; color: #1e293b; }
-                        h2 { text-align: center; color: #1b365d; margin-bottom: 5px; }
-                        p { text-align: center; font-size: 9pt; color: #0d7a5f; margin-top: 0; }
+                        .header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px; border-bottom: 2px solid #1b365d; padding-bottom: 10px; }
+                        .header img { max-height: 60px; }
+                        .header-text { text-align: center; }
+                        h2 { text-align: center; color: #1b365d; margin: 0; font-size: 14pt; }
+                        p { text-align: center; font-size: 9pt; color: #0d7a5f; margin: 2px 0 0 0; font-weight: bold; }
                         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
                         th, td { border: 1px solid #cbd5e1; padding: 6px; text-align: left; font-size: 9pt; }
                         th { background-color: #1b365d; color: white; }
@@ -1657,8 +1821,13 @@
                     </style>
                 </head>
                 <body>
-                    <h2>SEKOLAH KEBANGSAAN (F) PALONG 7</h2>
-                    <p>RINGKASAN REKOD ONE PAGE REPORT (OPR) PLC 2026</p>
+                    <div class="header">
+                        <img src="${LOGO_URL}" alt="Logo SKP7">
+                        <div class="header-text">
+                            <h2>SEKOLAH KEBANGSAAN (FELDA) PALONG 7</h2>
+                            <p>RINGKASAN REKOD ONE PAGE REPORT (OPR) PLC 2026</p>
+                        </div>
+                    </div>
                     <table>
                         <thead>
                             <tr>
